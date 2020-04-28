@@ -18,6 +18,7 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
 , bDrawWordBoundaries(false)
 , mWordBoundaryPadding(2)
 , mWordBoundaryColor(ofColor::red)
+, bigFontMult(4)
 {
     setText(text);
     setAlignment(align);
@@ -167,13 +168,22 @@ void Paragraph::setAlignment(Alignment align)
 void Paragraph::setFont(std::string file, int size)
 {
     //mFont = ofxSmartFont::add(file, size, name);
-    ttf.load(file, size, true, true, true, 0.3f, 0);
+    // increase dpi to get smooth shapes ?
+    ttf.load(file, size, true, true, true, 0.3f, 96); // default 96
+    ttfBig.load(file, size*bigFontMult, true, true, true, 0.3f, 96/**bigFontMult*/); // poor anti aliasing of scaled down ig text ??
+    
+    // Set spacing when scaling up 
+
     render();
 }
 
 void Paragraph::render()
 {
     //if (mFont == nullptr) return;
+    if(!ttf.isLoaded()) {
+        return;
+    }
+    
     mWords.clear();
     mLineHeight = 0;
     std::string str = mText;
@@ -239,5 +249,408 @@ void Paragraph::render()
             for(int j=0; j<mLines[i].size(); j++) mLines[i][j]->rect.x += offset;
         }
     }
+    
+    // TODO: Go through words and create index of all letters
+    mLetters.clear();
+    mLetterPaths.clear();
+    
+    float lineY = 0; // mLeading;
+
+    for(auto &line : mLines) {
+        
+        for(auto &w : line) {
+            // for word in line
+            //std::vector<char> letters(w->text.begin(), w->text.end());
+            
+            // Our letter position does not align exactly.
+            // look at: https://github.com/sosolimited/ofxSoso/blob/master/src/ofxSosoTrueTypeFont.cpp#L1049
+            // we also do not handle ligatures at the moment
+            
+            std::vector<ofPath> letterPaths =  ttfBig.getStringAsPoints(w->text);
+            
+            w->letterPaths = letterPaths;
+            float lX = w->rect.getX();
+            
+            //std::cout<<"Letters: ";
+            
+            /*for(int i=0; i <= ofUTF8Length(w->text); i++) {
+                
+                 std::string s = ofUTF8Substring(w->text, i,1);
+                 //std::string s(1, c);
+                
+                 ofRectangle b = ttf.getStringBoundingBox(s, lX, 0);
+                 lX += b.getWidth() + ttf.getLetterSpacing();
+                 b.setY(lineY);
+                
+                 std::cout<<s;
+                 
+                 letter newLetter = {s, b};
+                 mLetters.push_back(newLetter);
+                 
+                 //mLetters.push new letter
+             }*/
+            
+            /*for(auto &path : letterPaths) {
+            
+                //ofRectangle b = ttf.getStringBoundingBox(s, lX, 0);
+                //lX += b.getWidth() + ttf.getLetterSpacing();
+                //b.setY(lineY);
+                // add path to our word struct instead ?
+                letterPath newPath = {path};
+                mLetterPaths.push_back(newPath);
+                //mLetters.push new letter
+            }*/
+            //std::cout<<"|END"<<std::endl;
+        }
+        
+        lineY += (mLineHeight + mLeading);
+    }
 }
+
+
+void Paragraph::drawLetterAtPos( float x, float y) {
+}
+
+
+// a boolean function that tells ofSort how to compare two items
+bool sortWordsByDistance(Paragraph::word & a, Paragraph::word & b){
+    if (a._yDist == b._yDist){
+        // same line
+        if (a._xDist > b._xDist){
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if (a._yDist > b._yDist){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+void Paragraph::drawMagnifiedLetters(float x, float y, int magLetters, bool pushLeft, float scale) { // Scale is 1 to bigFontMult
+    // draw original in red to debug alignment
+    
+    
+    ofPushMatrix();
+    ofTranslate(this->x, this->y);
+    
+    ofVec2f focusPos(x - this->x, y - this->y);
+    
+    ofPushStyle();
+    
+    std::vector<word*> currentLine;
+    
+    //float lY = 0;
+    // first draw lines we dont need to magnify
+    for(auto &line : mLines) {
+        
+        // Draw the baseline
+        //ofSetColor(0,0,0);
+        //ofDrawLine(0, lY, mWidth, lY);
+        //lY += mLineHeight + mLeading;
+        
+        ofRectangle lineRect(0,
+        line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
+        mWidth, mLineHeight + (mWordBoundaryPadding * 2));
+           
+        if( !lineRect.inside(focusPos)) {
+            for(auto &w : line) {
+                   ofSetColor(50,50,50);
+                   ttf.drawString(w->text, w->rect.x, w->rect.y);
+            }
+        } else {
+            // save the line we need to magnify
+            currentLine = line;
+        }
+    }
+    
+    // Then take care of the magnified line word by word path by path
+    
+    
+    float xOffset = 0;
+    float bigWordPadding = mWordBoundaryPadding * bigFontMult;
+    //word* currentWord;
+    int mCount = 0;
+
+    std::vector<word*> wordsBefore;
+    std::vector<word*> wordsAfter;
+    std::vector<word*> wordsMagnify;
+        
+    for (std::size_t i = 0, e = currentLine.size(); i != e; ++i) {
+        auto &w = currentLine.at(i);
+        
+        ofRectangle r(w->rect.x - mWordBoundaryPadding,
+            w->rect.y - mLineHeight - mWordBoundaryPadding,
+            w->rect.width + (mWordBoundaryPadding * 2),
+            mLineHeight + (mWordBoundaryPadding * 2));
+        
+        ofRectangle restRect(w->rect.x - w->rect.width - mWordBoundaryPadding,0,
+           mWidth, mHeight);
+                
+        if( focusPos.x < w->rect.getX() + w->rect.width ) {
+            
+            // magnify minimum 10 ligatures/letters
+            if(mCount < magLetters /*&& (i+1) < currentLine.size()*/) {
+                
+                ofRectangle bigBounding = ttfBig.getStringBoundingBox(w->text, r.x, w->rect.y);
+                if(pushLeft) {
+                    xOffset -= bigBounding.width - r.width + bigWordPadding;
+                }
+                
+                if(w->letterPaths.size() + mCount > magLetters) {
+                    // TODO: option paths of word to hit 10 letters/ligatures
+                } // else - take a whole word more
+                
+                wordsMagnify.insert(wordsMagnify.begin(),w);
+                mCount += w->letterPaths.size();
+                
+                
+            } else {
+                wordsAfter.push_back(w);
+            }
+            
+            /*ofPushMatrix();
+            ofTranslate(wordRect.x + wordRect.width/2, w->rect.y);
+            ofScale(_s, _s);
+            ofTranslate(-(wordRect.x + wordRect.width/2), -w->rect.y);
+            */
+             
+            // draw white bacground behind magnified
+            //ofSetColor(255,255,255);
+            //ofDrawRectangle(bigR);
+            
+            //ofPopMatrix();
+            //ofSetColor(0,0,0);
+            //ttfBig.drawString(w->text, r.x - (bigBounding.width - r.width) , w->rect.y);
+
+            for(auto &path : w->letterPaths) {
+                //path.draw( r.x - (bigBounding.width - r.width) , w->rect.y);
+            }
+            
+         } else {
+             wordsBefore.push_back(w);
+         }
+    }
+    
+
+    
+    for(auto &w : wordsBefore) {
+        ofSetColor(0,0,0);
+        ttf.drawString(w->text, w->rect.x + xOffset, w->rect.y);
+    }
+    
+    for(auto &w : wordsAfter) {
+        ofSetColor(0,0,0);
+        ttf.drawString(w->text, w->rect.x, w->rect.y);
+    }
+    
+
+    float magnifyXOffset = 0;
+    
+    for(auto &w : wordsMagnify) { // from last
+        
+        ofRectangle r(w->rect.x - mWordBoundaryPadding,
+            w->rect.y - mLineHeight - mWordBoundaryPadding,
+            w->rect.width + (mWordBoundaryPadding * 2),
+            mLineHeight + (mWordBoundaryPadding * 2));
+
+        ofRectangle bigBounding = ttfBig.getStringBoundingBox(w->text, r.x, w->rect.y);
+        
+        magnifyXOffset += bigBounding.width - r.width + bigWordPadding;
+        
+        ofRectangle bigR(r.x - (magnifyXOffset + bigWordPadding), w->rect.y - (bigBounding.height + bigWordPadding), bigBounding.width + bigWordPadding*2, bigBounding.height + bigWordPadding*2);
+        
+        // draw white bacground behind magnified
+        ofSetColor(255,255,255);
+        ofDrawRectangle(bigR);
+        
+        ofSetColor(0,0,0);
+        ttfBig.drawString(w->text, r.x - magnifyXOffset, w->rect.y);
+        
+        //magnifyXOffset += bigBounding.width ;
+        
+        //ttf.drawString(w->text, w->rect.x, w->rect.y);
+    }
+    
+
+    
+    ofPopStyle();
+    
+    /*ofPushStyle();
+    for(auto &l : mLetters) {
+        ofSetColor(0,0,200);
+        ttf.drawString(l.text , this->x + l.rect.x, this->y + l.rect.y );
+        
+    }
+    ofPopStyle();*/
+    
+    /*ofPushStyle();
+    ofSetColor(0,0,0);
+    for(auto &path : mLetterPaths) {
+        path.path.draw(this->x, this->y);
+    }
+    ofPopStyle();*/
+    
+    ofPopMatrix();
+    
+}
+
+
+
+void Paragraph::drawMagnified1(float x, float y, float scale) { // Scale is 1 to bigFontMult
+    
+    float maxDist = 400;
+    float bigWordPadding = mWordBoundaryPadding * bigFontMult;
+    ofVec2f focusPos(x - this->x, y - this->y);
+    
+    for(auto &w : mWords) {
+        ofRectangle r(w.rect.x - mWordBoundaryPadding,
+        w.rect.y - mLineHeight - mWordBoundaryPadding,
+        w.rect.width + (mWordBoundaryPadding * 2),
+                      mLineHeight + (mWordBoundaryPadding * 2));
+        
+        ofVec2f wordCenter(r.x + (r.width / 2), (r.y + (r.height / 2)));
+        
+        w._xDist = abs(focusPos.x - wordCenter.x);
+        w._yDist = abs(focusPos.y - wordCenter.y);
+        w.pushOut = 0;
+    }
+    
+    ofSort(mWords, sortWordsByDistance);
+    
+    float pushBack = 0;
+    float pushFront = 0;
+    
+    for( auto it = mWords.rbegin(); it != mWords.rend(); ++it ) {
+            //*it.pushOut =
+        word & w = *it;
+        w.pushOut = 0;
+        //std::cout<<" it " << w.text << std::endl;
+        
+        ofRectangle r(w.rect.x - mWordBoundaryPadding,
+        w.rect.y - mLineHeight - mWordBoundaryPadding,
+        w.rect.width + (mWordBoundaryPadding * 2),
+                      mLineHeight + (mWordBoundaryPadding * 2));
+        
+        ofVec2f wordCenter(r.x + (r.width / 2), (r.y + (r.height / 2)));
+        
+        if( w._xDist < maxDist && r.inside(wordCenter.x,  focusPos.y)) { // multiple words on the line
+            float _s = ofMap(w._xDist, 0, r.width*2, 1, scale, true);
+            
+            ofRectangle bigBounding = ttfBig.getStringBoundingBox(w.text, r.x, w.rect.y);
+            ofRectangle bigR(r.x + r.width/2 - (bigBounding.width/2 + bigWordPadding), w.rect.y - (bigBounding.height + bigWordPadding), bigBounding.width + bigWordPadding*2, bigBounding.height + bigWordPadding*2);
+            
+            if(pushFront == 0) { // first
+                pushBack -= (bigR.width/2)* 1-(1/_s);
+                pushFront += (bigR.width/2)* 1-(1/_s);
+            } else {
+                if(wordCenter.x < focusPos.x) {
+                    w.pushOut = pushBack;//ofLerp(w.pushOut, pushBack, 0.5);
+                    pushBack -= (bigR.width)* 1-(1/_s);
+
+                } else {
+                    w.pushOut = pushFront;//ofLerp(w.pushOut, pushFront, 0.5);
+                    pushFront += (bigR.width)* 1-(1/_s);
+                }
+            }
+        }
+    }
+
+        
+    for(auto w : mWords) {
+        
+        ofRectangle r(w.rect.x - mWordBoundaryPadding,
+        w.rect.y - mLineHeight - mWordBoundaryPadding,
+        w.rect.width + (mWordBoundaryPadding * 2),
+                      mLineHeight + (mWordBoundaryPadding * 2));
+        
+        ofVec2f wordCenter(r.x + (r.width / 2), (r.y + (r.height / 2)));
+        // Current word
+                
+        //float yDist = abs((y - this->y) - wordCenter.y);
+        //float xDist = abs((x - this->x) - wordCenter.x);
+        //float dist = focusPos.distance(ofVec2f(r.x + (r.width / 2), r.y + (r.height / 2)) );
+        
+        if( w._xDist < maxDist && r.inside(wordCenter.x,  focusPos.y)) { // multiple words on the line
+        
+        //if(true) {
+            float _s = ofMap(w._xDist, 0, r.width*2, 1, scale, true);
+
+        //if(r.inside(focusPos)) { // one word
+            //float _s = ofMap(dist, 0, r.width/2, scale, 1, true);
+            
+            //std::cout<<w._xDist<<" "<<scale<<std::endl;
+            
+            ofPushStyle();
+            ofPushMatrix();
+
+            ofTranslate(this->x, this->y);
+            
+            //ofPushMatrix();
+            
+            /*ofTranslate(r.x + r.width/2, w.rect.y);
+            ofScale(scale,scale);
+            ofTranslate(-(r.x + r.width/2), -w.rect.y);*/
+            
+            /*
+             ofPushStyle();
+            ofNoFill();
+            ofSetColor(255,0,0);
+            ofDrawRectangle(r);
+            ofPopStyle();
+            */
+            
+            //ofDrawRectangle(w.rect);
+            //ofPopMatrix();
+            
+            ofSetColor(0, 0, 255);
+            
+            ofPushMatrix();
+            ofTranslate(r.x + r.width/2, w.rect.y);
+            ofScale((1/_s), (1/_s) );
+            ofTranslate(-(r.x + r.width/2), -w.rect.y);
+            
+            //ofTranslate(w.pushOut, 0);
+                                    
+            ofRectangle bigBounding = ttfBig.getStringBoundingBox(w.text, r.x, w.rect.y);
+            ofRectangle bigR(r.x + r.width/2 - (bigBounding.width/2 + bigWordPadding), w.rect.y - (bigBounding.height + bigWordPadding), bigBounding.width + bigWordPadding*2, bigBounding.height + bigWordPadding*2);
+            
+            ofSetColor(255,255,255);
+            ofDrawRectangle(bigR);
+            
+            ofSetColor(0);
+            //ofDrawCircle(r.x+ r.width/2,r.y,4); // Draw word center
+
+            ttfBig.drawString(w.text, r.x + r.width/2 - bigBounding.width/2, w.rect.y);
+            ofPopMatrix();
+                        
+            ofPopMatrix();
+            ofPopStyle();
+            
+            //return;
+
+        } else {
+            
+            ofSetColor(0);
+            ttf.drawString(w.text, this->x + w.rect.x, this->y + w.rect.y);
+
+        }
+        
+    }
+}
+
+
+void Paragraph::drawNearestWord(float x, float y) {
+    
+    for(auto w : mWords) {
+        if(w.rect.inside( x- this->x ,  y-this->y)) {
+            ttf.drawString(w.text, this->x + w.rect.x, this->y + w.rect.y);
+            return;
+        }
+    }
+}
+
 

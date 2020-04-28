@@ -8,9 +8,7 @@
 
 #include "ofApp.h"
 
-
 static zmq::context_t *ctx = NULL;
-
 static zmq::context_t& ZmqContext()
 {
     if (ctx == NULL)
@@ -19,7 +17,6 @@ static zmq::context_t& ZmqContext()
     }
     return *ctx;
 }
-
 
 void PupilZmq::connect(string addr="127.0.0.1") {
     
@@ -40,14 +37,11 @@ void PupilZmq::connect(string addr="127.0.0.1") {
     socket.connect(getApiAddress(addr, port));
     
     // https://docs.pupil-labs.com/developer/core/overview/#pupil-datum-format
-    
-    const std::string topic = "gaze.3d.1.";
+    const std::string topic = "pupil.0";//"gaze.3d.1.";
     socket.setsockopt(ZMQ_SUBSCRIBE, topic.c_str(), topic.size());
-    
     
     std::cout << "ZMQ_SUBSCRIBE" << std::endl;
 }
-
 
 void PupilZmq::receive() {
     
@@ -77,29 +71,42 @@ void PupilZmq::receive() {
 
 void ofApp::setup()
 {
-    
-    pupilZmq.connect();
-    
-    
+    ofEnableAntiAliasing();
+    ofEnableSmoothing();
 
+    
+    gui.setup();
+    //gui.add(bUseEyeTracker.set("use eye tracker", bUseEyeTracker));
+    
+    gui.add(pushTextLeft.set("push left", true));
+    gui.add(numMagnifyLetters.set("min letters", 10, 1, 20));
+    gui.add(letterScale.set("scale", 4));
+
+    
+    //gui.add(radius.set("radius", radius));
+    //gui.add(magnificationArea.set("magnify area", magnificationArea));
+
+    //pupilZmq.connect();
+    
     ofEnableAlphaBlending();
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
     
-    fbo1.allocate(ofGetScreenWidth(), ofGetScreenHeight());
+    //fbo1.allocate(ofGetScreenWidth(), ofGetScreenHeight());
     
-    shader.load("shadersGL3/shader");
+    //shader.load("shadersGL3/shader");
+
+    //shader.load("shadersGL3/magglass");
     
-    int planeWidth = ofGetWidth();
-    int planeHeight = ofGetHeight();
+    /*int planeWidth = ofGetScreenWidth();
+    int planeHeight = ofGetScreenHeight();
     int planeGridSize = 20;
     int planeColums = planeWidth / planeGridSize;
     int planeRows = planeHeight / planeGridSize;
     
     plane.set(planeWidth, planeHeight, planeColums, planeRows, OF_PRIMITIVE_TRIANGLES);
     
-    plane.mapTexCoordsFromTexture(fbo1.getTexture());
-
+    plane.mapTexCoordsFromTexture(fbo1.getTexture());*/
     
     ofBackground(ofColor::white);
     ofSetFullscreen(true);
@@ -147,23 +154,19 @@ void ofApp::setup()
 
 void ofApp::update() {
     
-    std::cout << "update" << std::endl;
     
-    pupilZmq.receive();
+    //pupilZmq.receive();
     
-
-
     /*
-           
     */
 }
 
 void ofApp::draw()
 {
     
+    
     //std::cout << "draw" << std::endl;
 
-    
     // draw the paragraphs //
     // how to get word and letter at fixation point?
     
@@ -174,58 +177,64 @@ void ofApp::draw()
     
     // text in box or gradual white out line above and under
     
-    fbo1.begin();
+    float cx = ofGetWidth() / 2.0;
+    float cy = ofGetHeight() / 2.0;
+    
+    // the plane is being position in the middle of the screen,
+    // so we have to apply the same offset to the mouse coordinates before passing into the shader.
+    // TODO add gui toggle
+    //x = (pupilZmq.gaze.norm_pos[0] * ofGetWidth()) ; //- cx; //
+    //y = (pupilZmq.gaze.norm_pos[1] * ofGetHeight()) ; //- cy; //
+    
+    x = mouseX;
+    y = mouseY;
+    
+    //fbo1.begin();
         ofClear(255, 255, 255, 255);
-        ofSetColor(255);
-        
-    ofPushMatrix();
+
+    //ofPushMatrix();
     //ofScale(1,-1, 1);
-        for (int i=0; i<paragraphs.size(); i++){
-            paragraphs[i]->draw();
-        }
-    ofPopMatrix();
-    fbo1.end();
+        //for (int i=0; i<paragraphs.size(); i++){
+        ofSetColor(255);
+        //paragraphs[0]->draw();
+        //paragraphs[0]->drawMagnified1(x, y, 4);
+        paragraphs[0]->drawMagnifiedLetters(x, y, numMagnifyLetters, pushTextLeft, letterScale);
+        //ofDrawCircle(x, y, 10);
+
+        //}
+    //ofPopMatrix();
+    //fbo1.end();
     
-    shader.begin();
-       
-       // center screen.
-       float cx = ofGetWidth() / 2.0;
-       float cy = ofGetHeight() / 2.0;
-       
-       // the plane is being position in the middle of the screen,
-       // so we have to apply the same offset to the mouse coordinates before passing into the shader.
-    
-    x = (pupilZmq.gaze.norm_pos[0] * ofGetWidth()) - cx; // mouseX - cx
-    y = (pupilZmq.gaze.norm_pos[1] * ofGetHeight()) - cy; // mouseY - cy
-    
-    //float mx = mouseX - cx;
-    //float my = mouseY - cy;
-    
-    
-       shader.setUniform1f("mouseRange", 150);
-       shader.setUniform2f("mousePos", x, -y);
-       shader.setUniformTexture("tex0", fbo1.getTexture(), 0);
-    
+    //shader.begin();
+        
+   // shader.setUniform4f("iMouse",  x-cx, -(y-cy), 0, 0);
+   // shader.setUniform3f("iResolution", ofGetWidth(), ofGetHeight(), 0);
+        
+       //shader.setUniform1f("mouseRange", radius*150);
+       //shader.setUniform2f("magnificationArea", magnificationArea*150);
+       //shader.setUniform2f("mousePos", x-cx, -(y-cy));
+       //shader.setUniformTexture("tex0", fbo1.getTexture(), 0);
         // send distance to top of line
         // send lineheight
     
         // send bounds of current word
         // send bounds of current line
     
-
+    /*ofPushMatrix();
         ofTranslate(cx, cy);
-        ofScale(1,-1);
-
-        plane.draw();
+        //ofScale(0.25,-0.25);
+        //ofScale(1,-1);
+        //plane.draw();
         
+    ofPopMatrix();
+     */
     //fbo1.draw(0, 0);
-       
-      shader.end();
-    
+    //shader.end();
     
     ofSetColor(0);
-    ofDrawCircle(x, y, 10);
+    //ofDrawCircle(x, y, 2);
     
+    gui.draw();
     
 }
 

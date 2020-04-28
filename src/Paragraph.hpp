@@ -43,14 +43,75 @@ class Paragraph{
         int getWidth();
         int getHeight();
         int getStringHeight(std::string str = "");
+        
     
+        void drawLetterAtPos(float x, float y);
+    
+        void drawMagnified1(float x, float y, float scale=4);
+        void drawMagnifiedLetters(float x, float y, int magLetters=10, bool pushLeft=true, float scale=4);
+    
+        void drawNearestWord(float x, float y);
+
         void draw();
         void draw(int x, int y);
         void drawBorder(bool draw);
         void drawBorder(ofColor color);
         void drawWordBoundaries(bool draw = true);
     
+        
+        struct letter {
+               std::string text;
+               ofRectangle rect;
+               ofPath path;
+               
+               float _xDist;
+               float _yDist;
+               float pushOut;
+        };
+    
+    struct letterPath {
+        
+        ofPath path;
+        std::string text;
+        ofRectangle rect;
+           
+        float _xDist;
+        float _yDist;
+        float pushOut;
+    };
+    
+    
+    
+        struct word {
+            std::string text;
+            ofRectangle rect;
+            
+            std::vector<ofPath> letterPaths;
+            
+            //float xOffset;
+            
+            // Deprecate
+            float _xDist;
+            float _yDist;
+            float pushOut;
+            
+        };
+    
+    
+    /*struct bigWord {
+        std::string text;
+        ofRectangle rect;
+        
+        float _xDist;
+        float _yDist;
+        float pushOut;
+        
+    };*/ // TODO: optimization
+        
+    
     private:
+        
+        int bigFontMult;
     
         int mWidth;
         int mHeight;
@@ -63,7 +124,9 @@ class Paragraph{
         Alignment mAlignment;
     
         ofTrueTypeFont ttf;
+        ofTrueTypeFont ttfBig;
 
+    
         bool bDrawBorder;
         ofColor mBorderColor;
         int mBorderPadding;
@@ -71,10 +134,8 @@ class Paragraph{
         int mWordBoundaryPadding;
         ofColor mWordBoundaryColor;
     
-        struct word {
-            std::string text;
-            ofRectangle rect;
-        };
+        std::vector< letter > mLetters;
+        std::vector< letterPath > mLetterPaths;
     
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;

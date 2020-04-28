@@ -1,38 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Bucket
-   uuid = "502F1D10-2C90-4F82-838E-CBB15613CBFA"
+   uuid = "601ADD4B-6656-4CA1-80E1-395CDFF2439D"
    type = "1"
    version = "2.0">
    <Breakpoints>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6BC66D0A-914D-4DA7-B99D-AAE03E5C108D"
+            uuid = "DF6DA904-A681-40B0-95D8-FAEEF53F2AA8"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "src/Paragraph.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
-            landmarkName = "Paragraph::setFont(file, size)"
+            startingLineNumber = "289"
+            endingLineNumber = "289"
+            landmarkName = "Paragraph::render()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C51C1252-B59E-4A45-B848-E6B1FB3B105D"
+            uuid = "B7E57111-4491-4699-A3B4-31D7078CDC70"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "src/ofApp.cpp"
+            filePath = "src/Paragraph.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "150"
-            endingLineNumber = "150"
-            landmarkName = "ofApp::update()"
+            startingLineNumber = "287"
+            endingLineNumber = "287"
+            landmarkName = "Paragraph::render()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DEC766BD-70C4-46F4-8F13-6E051C2BC18C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "src/Paragraph.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "487"
+            endingLineNumber = "487"
+            landmarkName = "Paragraph::drawMagnifiedLetters(x, y, magLetters, pushLeft, scale)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
