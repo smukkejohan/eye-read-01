@@ -37,7 +37,7 @@ void PupilZmq::connect(string addr="127.0.0.1") {
     socket.connect(getApiAddress(addr, port));
     
     // https://docs.pupil-labs.com/developer/core/overview/#pupil-datum-format
-    const std::string topic = "pupil.0";//"gaze.3d.1.";
+    const std::string topic = "pupil.0"; // pupil.0";//"gaze.3d.1.";
     socket.setsockopt(ZMQ_SUBSCRIBE, topic.c_str(), topic.size());
     
     std::cout << "ZMQ_SUBSCRIBE" << std::endl;
@@ -64,8 +64,15 @@ void PupilZmq::receive() {
        
        // convert msgpack::object instance into the original type.
        // if the type is mismatched, it throws msgpack::type_error exception.
-       deserialized.convert(gaze);
-       //std::cout << "Gaze " << gaze.norm_pos[0] << ":" << gaze.norm_pos[1] << std::endl;
+    
+        Pupil newData;
+       deserialized.convert(newData);
+        
+    if(newData.confidence > 0.6) {
+       // std::cout << "Pupil " << pupil.norm_pos[0] << "," << pupil.norm_pos[1] << "  " << pupil.confidence << std::endl;
+        pupil = newData;
+    }
+    
 }
 
 
@@ -73,8 +80,8 @@ void ofApp::setup()
 {
     ofEnableAntiAliasing();
     ofEnableSmoothing();
+    ofSetFrameRate(240);
 
-    
     gui.setup();
     //gui.add(bUseEyeTracker.set("use eye tracker", bUseEyeTracker));
     
@@ -82,20 +89,16 @@ void ofApp::setup()
     gui.add(numMagnifyLetters.set("min letters", 10, 1, 20));
     gui.add(letterScale.set("scale", 4));
 
-    
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
-
-    //pupilZmq.connect();
+    pupilZmq.connect();
     
     ofEnableAlphaBlending();
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
     
     //fbo1.allocate(ofGetScreenWidth(), ofGetScreenHeight());
-    
     //shader.load("shadersGL3/shader");
-
     //shader.load("shadersGL3/magglass");
     
     /*int planeWidth = ofGetScreenWidth();
@@ -148,15 +151,12 @@ void ofApp::setup()
     }
     
     std::cout << "end setup" << std::endl;
-
 }
 
 
 void ofApp::update() {
     
-    
-    //pupilZmq.receive();
-    
+    pupilZmq.receive();
     /*
     */
 }
@@ -183,11 +183,19 @@ void ofApp::draw()
     // the plane is being position in the middle of the screen,
     // so we have to apply the same offset to the mouse coordinates before passing into the shader.
     // TODO add gui toggle
-    //x = (pupilZmq.gaze.norm_pos[0] * ofGetWidth()) ; //- cx; //
-    //y = (pupilZmq.gaze.norm_pos[1] * ofGetHeight()) ; //- cy; //
+    //x = ofMap(pupilZmq.pupil.norm_pos[0], TOP_LEFT_X, TOP_RIGHT_X, 0, ofGetWidth());
+    //y = ofMap(pupilZmq.pupil.norm_pos[1], BOTTOM_LEFT_Y, TOP_LEFT_Y, 0, ofGetHeight());
     
-    x = mouseX;
-    y = mouseY;
+    //x = (pupilZmq.pupil.norm_pos[0] * ofGetWidth()) ; //- cx; //
+    //y = ((1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight()) ; //- cy; //
+    
+    x = pupilZmq.pupil.norm_pos[0] * ofGetWidth();
+    y = (1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight();
+    
+    std::cout << "Data mapped " << x << ", " << y << "    " << pupilZmq.pupil.confidence << std::endl;
+    
+    //x = mouseX;
+    //y = mouseY;
     
     //fbo1.begin();
         ofClear(255, 255, 255, 255);
@@ -232,7 +240,7 @@ void ofApp::draw()
     //shader.end();
     
     ofSetColor(0);
-    //ofDrawCircle(x, y, 2);
+    ofDrawCircle(x, y, 10);
     
     gui.draw();
     

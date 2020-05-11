@@ -22,7 +22,6 @@
 // Remember to escape quotes
 const string text1 = R"(Vi var kommet forbi striben af firkantede lodder, flade, bortset fra de gule etplanshuse, der var skudt op på nogle af dem. Og så lå den der pludselig, vejen. Den var ryddet for sne og skar sig gennem alt det hvide i begge retninger, så langt man kunne se. Det så pænt ud. Måske forstærket af alt roderiet bag os, stierne, grusvejene, markerne og byggepladserne, som vi ikke kunne hitte ud af. På den anden side var en mark, hvid og med striber af sort, fuget jord. Den fortsatte udefter og over i en gråhvid dis. Det var et mærkeligt sted, så langt væk, man kunne komme, og med universet og rummet trukket tæt på. Vi spurgte, om vi var der, om det var dét her. Så løftede han armen og pegede ud over marken, som om han ville kommandere os fremad eller sige "dér ovre, lige på den anden side." Det samme sted eller lidt derfra stod en række kæmpestore betonskeletter, uhyggelige, levende væsener og samtidig papirstynde og skrøbelige og så bittesmå, at man kunne løfte dem op i hånden eller vælte dem ét ad gangen med et puf med det yderste af fingrene. De så fine ud, række efter række og en lille smule forskudt i en skrå linje bagud. Nedefra var de oplyst af projektører, der skar dem fri af mørket og trak dem tættere på, så de i nogle feberagtige, svimlende sekunder så ud til at ville lette. Og så gik vi hjem. Imens fortalte han en af sine historier. Til sidst bar han mig. Det er det år, mine forældre er blevet skilt. Det samme er Louis’ forældre eller gået fra hinanden, for de var ikke rigtig gift ligesom mine. Det var hans mor, der gik, eller løb, hele vejen til Sønderjylland efter at være blevet gennembanket i årevis. Kort før den dag på grillbaren var skoleinspektøren kommet midt i en musiktime og havde givet mig et brev fra Louis, hvor han fortalte det hele. Han skrev også, at hans mor var dum.)";
 
-
 struct Gaze
 {
     //public:
@@ -43,16 +42,14 @@ struct Pupil
 {
     //public:
         std::string topic;
+    
         float norm_pos [2];
-        //float eye_center_3d [3];
-        //float gaze_normal_3d [3];
-        //float gaze_point_3d [3];
-        
-        //float confidence; // TODO: take data above 0.6
+
+        float confidence; // TODO: take data above 0.6
         //float timestamp; // cast to time / unsigned long int - seems to be float in the msgpack encoding
     
         //msgpack::object base_data; // 'base_data': [<pupil datum>]
-        MSGPACK_DEFINE_MAP(topic, norm_pos /*eye_center_3d, gaze_normal_3d, gaze_point_3d, confidence, timestamp, base_data*/);
+        MSGPACK_DEFINE_MAP(topic, norm_pos, confidence /*eye_center_3d, gaze_normal_3d, gaze_point_3d, confidence, timestamp, base_data*/);
 };
 
 
@@ -69,13 +66,12 @@ class PupilZmq
             
         }
     }*/
-    
 
     void connect(string addr);
     void receive();
     
-    //Gaze gaze;
-    Pupil gaze; // FIXME
+    Pupil pupil;
+    Gaze gaze;
     
     std::string getApiAddress(string addr, int port) {
         std::stringstream ss;
@@ -105,6 +101,25 @@ class ofApp : public ofBaseApp{
     ofTexture tex1;
     
     PupilZmq pupilZmq;
+    
+    /*
+    lower left 0.38111690686729993,0.4214027202406092
+    lower right 0.685358948107331,0.4051380090533916
+    top left 0.36712246520437525,0.6716195969513632
+    top right 0.6758969988342477,0.6645489801140543
+    */
+    
+    float TOP_LEFT_X = 0.36712246520437525;
+    float TOP_LEFT_Y = 0.6716195969513632;
+    
+    float TOP_RIGHT_X = 0.6758969988342477;
+    float TOP_RIGHT_Y = 0.6645489801140543;
+    
+    float BOTTOM_LEFT_X = 0.38111690686729993;
+    float BOTTOM_LEFT_Y = 0.4214027202406092;
+    
+    float BOTTOM_RIGHT_X = 0.685358948107331;
+    float BOTTOM_RIGHT_Y = 0.4051380090533916;
     
     float x;
     float y;
