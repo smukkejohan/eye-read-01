@@ -44,34 +44,54 @@ void PupilZmq::connect(string addr="127.0.0.1") {
 }
 
 void PupilZmq::receive() {
-    
-       zmq::message_t frame1;
-       socket.recv(&frame1);
-       zmq::message_t frame2;
-       socket.recv(&frame2);
-       // frame2 is a msgpack encoded key-value mapping
-
-       msgpack::sbuffer sbuf;
-       sbuf.write(static_cast<const char *>(frame2.data()), frame2.size());
-
-       // deserialize it.
-       msgpack::object_handle oh = msgpack::unpack(sbuf.data(), sbuf.size());
-       
-       // deserialized object is valid during the msgpack::object_handle instance is alive.
-       msgpack::object deserialized = oh.get();
-
-       //std::cout << "Received " << frame1 << deserialized << std::endl;
-       
-       // convert msgpack::object instance into the original type.
-       // if the type is mismatched, it throws msgpack::type_error exception.
-    
-        Pupil newData;
-       deserialized.convert(newData);
         
-    if(newData.confidence > 0.6) {
-       // std::cout << "Pupil " << pupil.norm_pos[0] << "," << pupil.norm_pos[1] << "  " << pupil.confidence << std::endl;
-        pupil = newData;
+    //ZMQ_SNDMORE ??
+    
+    // how to make sure we empty the buffer ?
+    zmq::message_t frame1;
+    zmq::message_t frame2;
+    //socket.get(sockopt::integral_option<Opt, T, BoolUnit>)
+    //socket.get(<#sockopt::array_option<Opt, NullTerm>#>)
+    
+    int64_t hwm;
+    size_t hwm_size = sizeof (hwm);
+    //zmq_getsockopt (socket, ZMQ, &hwm, &hwm_size);
+    //auto opt = socket.get(zmq::sockopt::events)
+    
+    while( socket.get(zmq::sockopt::events) & ZMQ_POLLIN ) { // zmq::sockopt::pollin
+        socket.recv(&frame1);
+        socket.recv(&frame2);
+        // frame2 is a msgpack encoded key-value mapping
     }
+    
+    try {
+        
+        msgpack::sbuffer sbuf;
+           sbuf.write(static_cast<const char *>(frame2.data()), frame2.size());
+
+           // deserialize it.
+           msgpack::object_handle oh = msgpack::unpack(sbuf.data(), sbuf.size());
+           
+           // deserialized object is valid during the msgpack::object_handle instance is alive.
+           msgpack::object deserialized = oh.get();
+
+           //std::cout << "Received " << frame1 << deserialized << std::endl;
+           
+           // convert msgpack::object instance into the original type.
+           // if the type is mismatched, it throws msgpack::type_error exception.
+        
+            Pupil newData;
+           deserialized.convert(newData);
+            
+        if(newData.confidence > 0.6) {
+           // std::cout << "Pupil " << pupil.norm_pos[0] << "," << pupil.norm_pos[1] << "  " << pupil.confidence << std::endl;
+            pupil = newData;
+        }
+        
+    } catch(const std::exception& e) {
+        
+    }
+       
     
 }
 
@@ -157,6 +177,8 @@ void ofApp::setup()
 void ofApp::update() {
     
     pupilZmq.receive();
+
+    //pupilZmq.receive();
     /*
     */
 }
@@ -183,16 +205,16 @@ void ofApp::draw()
     // the plane is being position in the middle of the screen,
     // so we have to apply the same offset to the mouse coordinates before passing into the shader.
     // TODO add gui toggle
-    //x = ofMap(pupilZmq.pupil.norm_pos[0], TOP_LEFT_X, TOP_RIGHT_X, 0, ofGetWidth());
-    //y = ofMap(pupilZmq.pupil.norm_pos[1], BOTTOM_LEFT_Y, TOP_LEFT_Y, 0, ofGetHeight());
+    x = ofMap(pupilZmq.pupil.norm_pos[0], LEFT_X, RIGHT_X, 0, ofGetWidth());
+    y = ofMap(pupilZmq.pupil.norm_pos[1], TOP_Y, BOTTOM_Y, 0, ofGetHeight());
     
     //x = (pupilZmq.pupil.norm_pos[0] * ofGetWidth()) ; //- cx; //
     //y = ((1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight()) ; //- cy; //
     
-    x = pupilZmq.pupil.norm_pos[0] * ofGetWidth();
-    y = (1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight();
+    //x = pupilZmq.pupil.norm_pos[0] * ofGetWidth();
+    //y = (1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight();
     
-    std::cout << "Data mapped " << x << ", " << y << "    " << pupilZmq.pupil.confidence << std::endl;
+    std::cout << "Data  " << pupilZmq.pupil.norm_pos[0] << ", " << pupilZmq.pupil.norm_pos[1] << std::endl;
     
     //x = mouseX;
     //y = mouseY;
