@@ -111,7 +111,7 @@ void ofApp::setup()
 
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
-    pupilZmq.connect();
+    //pupilZmq.connect();
     
     ofEnableAlphaBlending();
     //ofDisableArbTex();
@@ -176,11 +176,8 @@ void ofApp::setup()
 
 void ofApp::update() {
     
-    pupilZmq.receive();
-
     //pupilZmq.receive();
-    /*
-    */
+
 }
 
 void ofApp::draw()
@@ -205,8 +202,8 @@ void ofApp::draw()
     // the plane is being position in the middle of the screen,
     // so we have to apply the same offset to the mouse coordinates before passing into the shader.
     // TODO add gui toggle
-    x = ofMap(pupilZmq.pupil.norm_pos[0], LEFT_X, RIGHT_X, 0, ofGetWidth());
-    y = ofMap(pupilZmq.pupil.norm_pos[1], TOP_Y, BOTTOM_Y, 0, ofGetHeight());
+    //x = ofMap(pupilZmq.pupil.norm_pos[0], LEFT_X, RIGHT_X, 0, ofGetWidth());
+    //y = ofMap(pupilZmq.pupil.norm_pos[1], TOP_Y, BOTTOM_Y, 0, ofGetHeight());
     
     //x = (pupilZmq.pupil.norm_pos[0] * ofGetWidth()) ; //- cx; //
     //y = ((1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight()) ; //- cy; //
@@ -214,10 +211,10 @@ void ofApp::draw()
     //x = pupilZmq.pupil.norm_pos[0] * ofGetWidth();
     //y = (1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight();
     
-    std::cout << "Data  " << pupilZmq.pupil.norm_pos[0] << ", " << pupilZmq.pupil.norm_pos[1] << std::endl;
+    //std::cout << "Data  " << pupilZmq.pupil.norm_pos[0] << ", " << pupilZmq.pupil.norm_pos[1] << std::endl;
     
-    //x = mouseX;
-    //y = mouseY;
+    x = mouseX;
+    y = mouseY;
     
     //fbo1.begin();
         ofClear(255, 255, 255, 255);

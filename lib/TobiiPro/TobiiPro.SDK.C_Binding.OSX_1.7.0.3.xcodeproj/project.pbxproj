@@ -1,0 +1,147 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXFileReference section */
+		044CE968247D644900429C6C /* pkgconfig */ = {isa = PBXFileReference; lastKnownFileType = folder; path = pkgconfig; sourceTree = "<group>"; };
+		044CE969247D644900429C6C /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		044CE96A247D644900429C6C /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		044CE96B247D644900429C6C /* TobiiProSDK_EndUserLicenseAgreement.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TobiiProSDK_EndUserLicenseAgreement.pdf; sourceTree = "<group>"; };
+		044CE96C247D644900429C6C /* 64 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = 64; sourceTree = "<group>"; };
+		044CE96D247D644900429C6C /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		044CE962247D644900429C6C = {
+			isa = PBXGroup;
+			children = (
+				044CE968247D644900429C6C /* pkgconfig */,
+				044CE969247D644900429C6C /* .DS_Store */,
+				044CE96A247D644900429C6C /* Makefile */,
+				044CE96B247D644900429C6C /* TobiiProSDK_EndUserLicenseAgreement.pdf */,
+				044CE96C247D644900429C6C /* 64 */,
+				044CE96D247D644900429C6C /* README.txt */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		044CE967247D644900429C6C /* TobiiPro.SDK.C_Binding.OSX_1.7.0.3 */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 044CE96E247D644900429C6C /* Build configuration list for PBXLegacyTarget "TobiiPro.SDK.C_Binding.OSX_1.7.0.3" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/johan/dev/of/of_v0.11.0_osx_release/apps/myApps/eye-read-01/lib/TobiiPro.SDK.C_Binding.OSX_1.7.0.3";
+			dependencies = (
+			);
+			name = TobiiPro.SDK.C_Binding.OSX_1.7.0.3;
+			passBuildSettingsInEnvironment = 1;
+			productName = TobiiPro.SDK.C_Binding.OSX_1.7.0.3;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		044CE963247D644900429C6C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 044CE966247D644900429C6C /* Build configuration list for PBXProject "TobiiPro.SDK.C_Binding.OSX_1.7.0.3" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 044CE962247D644900429C6C;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				044CE967247D644900429C6C /* TobiiPro.SDK.C_Binding.OSX_1.7.0.3 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		044CE964247D644900429C6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		044CE965247D644900429C6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		044CE96F247D644900429C6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = TobiiPro.SDK.C_Binding.OSX_1.7.0.3;
+			};
+			name = Debug;
+		};
+		044CE970247D644900429C6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = TobiiPro.SDK.C_Binding.OSX_1.7.0.3;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		044CE966247D644900429C6C /* Build configuration list for PBXProject "TobiiPro.SDK.C_Binding.OSX_1.7.0.3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				044CE964247D644900429C6C /* Debug */,
+				044CE965247D644900429C6C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		044CE96E247D644900429C6C /* Build configuration list for PBXLegacyTarget "TobiiPro.SDK.C_Binding.OSX_1.7.0.3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				044CE96F247D644900429C6C /* Debug */,
+				044CE970247D644900429C6C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 044CE963247D644900429C6C /* Project object */;
+}

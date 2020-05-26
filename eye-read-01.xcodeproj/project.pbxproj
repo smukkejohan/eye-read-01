@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		044CE990247D6ACD00429C6C /* libtobii_research.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 044CE98F247D6ACD00429C6C /* libtobii_research.dylib */; };
+		044CE992247D6AD300429C6C /* libtobii_research.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 044CE991247D6AD300429C6C /* libtobii_research.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 907C5B5E104864A2D3A25745 /* ofxToggle.cpp */; };
 		483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78D67A00EB899FAC09430597 /* ofxLabel.cpp */; };
 		5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C88333E71C9457E441C33474 /* ofxButton.cpp */; };
@@ -31,12 +33,27 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				044CE992247D6AD300429C6C /* libtobii_research.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		044CE973247D644900429C6C /* tobii_research.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = tobii_research.pc; sourceTree = "<group>"; };
+		044CE974247D644900429C6C /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		044CE975247D644900429C6C /* TobiiProSDK_EndUserLicenseAgreement.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TobiiProSDK_EndUserLicenseAgreement.pdf; sourceTree = "<group>"; };
+		044CE976247D644900429C6C /* TobiiPro.SDK.C_Binding.OSX_1.7.0.3.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = TobiiPro.SDK.C_Binding.OSX_1.7.0.3.xcodeproj; sourceTree = "<group>"; };
+		044CE97B247D644900429C6C /* tobii_research_eyetracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tobii_research_eyetracker.h; sourceTree = "<group>"; };
+		044CE97C247D644900429C6C /* tobii_research_calibration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tobii_research_calibration.h; sourceTree = "<group>"; };
+		044CE97D247D644900429C6C /* tobii_research.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tobii_research.h; sourceTree = "<group>"; };
+		044CE97E247D644900429C6C /* tobii_research_streams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tobii_research_streams.h; sourceTree = "<group>"; };
+		044CE980247D644900429C6C /* libtobii_research.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libtobii_research.1.dylib; sourceTree = "<group>"; };
+		044CE981247D644900429C6C /* libtobii_research.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libtobii_research.1.7.0.dylib; sourceTree = "<group>"; };
+		044CE983247D644900429C6C /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		044CE98D247D6A1B00429C6C /* libtobii_research.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libtobii_research.dylib; sourceTree = "<group>"; };
+		044CE98F247D6ACD00429C6C /* libtobii_research.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtobii_research.dylib; path = ../../../../../../../../usr/local/lib/tobii_research/libtobii_research.dylib; sourceTree = "<group>"; };
+		044CE991247D6AD300429C6C /* libtobii_research.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtobii_research.dylib; path = ../../../../../../../../usr/local/lib/tobii_research/libtobii_research.dylib; sourceTree = "<group>"; };
 		04D3377124447CAF00C3880D /* magglass.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = magglass.vert; sourceTree = "<group>"; };
 		04D3377224447E1400C3880D /* magglass.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = magglass.frag; sourceTree = "<group>"; };
 		04F8B9B724377CDF008A44EC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -258,12 +275,88 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				044CE990247D6ACD00429C6C /* libtobii_research.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		044CE953247D5E6700429C6C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				044CE98F247D6ACD00429C6C /* libtobii_research.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		044CE961247D643C00429C6C /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				044CE971247D644900429C6C /* TobiiPro */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		044CE971247D644900429C6C /* TobiiPro */ = {
+			isa = PBXGroup;
+			children = (
+				044CE972247D644900429C6C /* pkgconfig */,
+				044CE974247D644900429C6C /* Makefile */,
+				044CE975247D644900429C6C /* TobiiProSDK_EndUserLicenseAgreement.pdf */,
+				044CE976247D644900429C6C /* TobiiPro.SDK.C_Binding.OSX_1.7.0.3.xcodeproj */,
+				044CE979247D644900429C6C /* 64 */,
+				044CE983247D644900429C6C /* README.txt */,
+			);
+			name = TobiiPro;
+			path = lib/TobiiPro;
+			sourceTree = SOURCE_ROOT;
+		};
+		044CE972247D644900429C6C /* pkgconfig */ = {
+			isa = PBXGroup;
+			children = (
+				044CE973247D644900429C6C /* tobii_research.pc */,
+			);
+			path = pkgconfig;
+			sourceTree = "<group>";
+		};
+		044CE977247D644900429C6C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		044CE979247D644900429C6C /* 64 */ = {
+			isa = PBXGroup;
+			children = (
+				044CE97A247D644900429C6C /* include */,
+				044CE97F247D644900429C6C /* lib */,
+			);
+			path = 64;
+			sourceTree = "<group>";
+		};
+		044CE97A247D644900429C6C /* include */ = {
+			isa = PBXGroup;
+			children = (
+				044CE97B247D644900429C6C /* tobii_research_eyetracker.h */,
+				044CE97C247D644900429C6C /* tobii_research_calibration.h */,
+				044CE97D247D644900429C6C /* tobii_research.h */,
+				044CE97E247D644900429C6C /* tobii_research_streams.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		044CE97F247D644900429C6C /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				044CE980247D644900429C6C /* libtobii_research.1.dylib */,
+				044CE981247D644900429C6C /* libtobii_research.1.7.0.dylib */,
+				044CE98D247D6A1B00429C6C /* libtobii_research.dylib */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
 		04F8B9B824378472008A44EC /* shadersGL3 */ = {
 			isa = PBXGroup;
 			children = (
@@ -649,6 +742,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				044CE991247D6AD300429C6C /* libtobii_research.dylib */,
 				04F8B9B724377CDF008A44EC /* README.md */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
@@ -658,12 +752,14 @@
 				BB4B014C10F69532006C3DED /* addons */,
 				6948EE371B920CB800B5AC1A /* local_addons */,
 				E4B69B5B0A3A1756003C02F2 /* eye-read-01Debug.app */,
+				044CE953247D5E6700429C6C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				044CE961247D643C00429C6C /* lib */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
@@ -683,7 +779,7 @@
 				E42962A92163ECCD00A6A9E2 /* ShellScript */,
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
-				E4B6FFFD0C3F9AB9008CF71C /* ShellScript */,
+				E4B6FFFD0C3F9AB9008CF71C /* Run Script */,
 				E4C2427710CC5ABF004149E2 /* CopyFiles */,
 				8466F1851C04CA0E00918B1C /* ShellScript */,
 			);
@@ -717,6 +813,12 @@
 			mainGroup = E4B69B4A0A3A1720003C02F2;
 			productRefGroup = E4B69B4A0A3A1720003C02F2;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 044CE977247D644900429C6C /* Products */;
+					ProjectRef = 044CE976247D644900429C6C /* TobiiPro.SDK.C_Binding.OSX_1.7.0.3.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				E4B69B5A0A3A1756003C02F2 /* eye-read-01 */,
@@ -749,20 +851,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"";
+			shellScript = "xcodebuild -project \"$OF_PATH/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj\" -target openFrameworks -configuration \"${CONFIGURATION}\"\n";
 		};
-		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
+		E4B6FFFD0C3F9AB9008CF71C /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy default icon file into App/Resources\nrsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy libfmod and change install directory for fmod to run\nrsync -aved \"$OF_PATH/libs/fmodex/lib/osx/libfmodex.dylib\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/\";\ninstall_name_tool -change @executable_path/libfmodex.dylib @executable_path/../Frameworks/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";\n\necho \"$GCC_PREPROCESSOR_DEFINITIONS\";\n";
+			shellScript = "mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy default icon file into App/Resources\nrsync -aved \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n# Copy libfmod and change install directory for fmod to run\nrsync -aved \"$OF_PATH/libs/fmodex/lib/osx/libfmodex.dylib\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/\";\ninstall_name_tool -change @executable_path/libfmodex.dylib @executable_path/../Frameworks/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";\n\n# Copy libtobii_research and change install directory for it to run\nrsync -aved \"/usr/local/lib/tobii_research/libtobii_research.dylib\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Frameworks/\";\ninstall_name_tool -change @rpath/libtobii_research.dylib @executable_path/../Frameworks/libtobii_research.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";\n\n\necho \"$GCC_PREPROCESSOR_DEFINITIONS\";\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -830,6 +933,7 @@
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-tobii_research",
 				);
 				SDKROOT = macosx;
 			};
@@ -853,17 +957,24 @@
 					../../../addons/ofxParagraph/src,
 					../../../addons/ofxSmartFont/src,
 					/usr/local/include,
+					/usr/local/include/tobii_research,
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/tobii_research,
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib/TobiiPro/64/lib",
+				);
 				OTHER_LDFLAGS = (
 					"$(LIB_OF)",
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-ltobii_research",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -908,6 +1019,7 @@
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-tobii_research",
 				);
 				SDKROOT = macosx;
 			};
@@ -950,6 +1062,7 @@
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-tobii_research",
 				);
 				SDKROOT = macosx;
 			};
@@ -973,17 +1086,24 @@
 					../../../addons/ofxParagraph/src,
 					../../../addons/ofxSmartFont/src,
 					/usr/local/include,
+					/usr/local/include/tobii_research,
 				);
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/tobii_research,
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib/TobiiPro/64/lib",
+				);
 				OTHER_LDFLAGS = (
 					"$(LIB_OF)",
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-ltobii_research",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)Debug";
 				WRAPPER_EXTENSION = app;
@@ -1007,17 +1127,24 @@
 					../../../addons/ofxParagraph/src,
 					../../../addons/ofxSmartFont/src,
 					/usr/local/include,
+					/usr/local/include/tobii_research,
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = /Applications;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/tobii_research,
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/lib/TobiiPro/64/lib",
+				);
 				OTHER_LDFLAGS = (
 					"$(LIB_OF)",
 					"$(OF_CORE_LIBS)",
 					"$(OF_CORE_FRAMEWORKS)",
 					"-lzmq",
+					"-ltobii_research",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
