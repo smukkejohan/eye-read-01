@@ -12,6 +12,10 @@
 #include "ofxGui.h"
 
 #include <tobii_research.h>
+#include <tobii_research_streams.h>
+#include <tobii_research_eyetracker.h>
+//#include <tobii_research_calibration.h>
+
 
 #define MSGPACK_DISABLE_LEGACY_NIL
 #include <msgpack.hpp>
@@ -27,9 +31,80 @@ const string text1 = R"(Vi var kommet forbi striben af firkantede lodder, flade,
 
 
 
-class TobiManager
+
+extern float TobiiX;
+extern float TobiiY;
+
+
+class TobiiManager
 {
 public:
+    
+    TobiiResearchEyeTracker* eyetracker;
+    char* device_address = NULL;
+    char device_address_arg[128];
+
+    // TobiiResearchGazeData
+    // TobiiResearchHMDGazeData
+    //typedef std::function<int (const TobiManager&)> gaze_data_callback;
+    
+    static void gaze_data_callback(TobiiResearchGazeData* gaze_data, void* user_data) {
+        //memcpy(user_data, gaze_data, sizeof(*gaze_data));
+        
+        //printf("Last received gaze package:\n");
+        //printf("System time stamp: %"  PRId64 "\n", gaze_data->system_time_stamp);
+        //printf("Device time stamp: %"  PRId64 "\n", gaze_data->device_time_stamp);
+        //printf("Left eye 2D gaze point on display area: (%f, %f)\n",
+        //gaze_data->left_eye.gaze_point.position_on_display_area.x,
+        //gaze_data->left_eye.gaze_point.position_on_display_area.y);
+        
+        TobiiX = gaze_data->left_eye.gaze_point.position_on_display_area.x;
+        TobiiY = gaze_data->left_eye.gaze_point.position_on_display_area.y;
+        
+        
+        
+    }
+    
+    void connect() {
+        TobiiResearchStatus status = tobii_research_get_eyetracker("tobii-prp://TPNA1-030109826674", &eyetracker);
+        
+        if (status != TOBII_RESEARCH_STATUS_OK) {
+              printf("ERROR: %d when trying to get eyetracker!\n", status);
+              exit(EXIT_FAILURE);
+          }
+        tobii_research_get_address(eyetracker, &device_address);
+        if (status != TOBII_RESEARCH_STATUS_OK) {
+              printf("ERROR: %d when trying to get address!\n", status);
+              exit(EXIT_FAILURE);
+        }
+        
+        TobiiResearchGazeData gaze_data;
+        status = tobii_research_subscribe_to_gaze_data(eyetracker, this->gaze_data_callback, &gaze_data);
+        
+        if (status != TOBII_RESEARCH_STATUS_OK) {
+            printf("ERROR: %d when trying to get address!\n", status);
+            exit(EXIT_FAILURE);
+        }
+        /*
+        printf("Left eye 2D gaze point on display area: (%f, %f)\n",
+                  gaze_data.left_eye.gaze_point.position_on_display_area.x,
+                  gaze_data.left_eye.gaze_point.position_on_display_area.y);
+        printf("Right eye 3d gaze origin in user coordinates (%f, %f, %f)\n",
+                  gaze_data.right_eye.gaze_origin.position_in_user_coordinates.x,
+                  gaze_data.right_eye.gaze_origin.position_in_user_coordinates.y,
+                  gaze_data.right_eye.gaze_origin.position_in_user_coordinates.z);
+         */
+        
+        //tobii_research_find_all_eyetrackers();
+        // tobii_research_subscribe_to_gaze_data
+        // tobii_research_subscribe_to_hmd_gaze_data
+    }
+    
+    void get_data() {
+        /*printf("Left eye 2D gaze point on display area: (%f, %f)\n",
+        TobiiX,
+        TobiiY);*/
+    }
     
 };
 
@@ -116,6 +191,8 @@ class ofApp : public ofBaseApp{
     ofTexture tex1;
     
     PupilZmq pupilZmq;
+    
+    TobiiManager tobii;
     
     /*
     lower left 0.38111690686729993,0.4214027202406092

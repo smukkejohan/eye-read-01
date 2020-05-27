@@ -8,6 +8,9 @@
 
 #include "ofApp.h"
 
+float TobiiX = 0;
+float TobiiY = 0;
+
 static zmq::context_t *ctx = NULL;
 static zmq::context_t& ZmqContext()
 {
@@ -113,6 +116,8 @@ void ofApp::setup()
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
     //pupilZmq.connect();
     
+    tobii.connect();
+    
     ofEnableAlphaBlending();
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
@@ -184,6 +189,9 @@ void ofApp::draw()
 {
     
     
+    tobii.get_data();
+    
+    
     //std::cout << "draw" << std::endl;
 
     // draw the paragraphs //
@@ -210,11 +218,13 @@ void ofApp::draw()
     
     //x = pupilZmq.pupil.norm_pos[0] * ofGetWidth();
     //y = (1-pupilZmq.pupil.norm_pos[1]) * ofGetHeight();
-    
     //std::cout << "Data  " << pupilZmq.pupil.norm_pos[0] << ", " << pupilZmq.pupil.norm_pos[1] << std::endl;
     
-    x = mouseX;
-    y = mouseY;
+    //x = mouseX;
+    //y = mouseY;
+    
+    x = TobiiX * ofGetWidth();
+    y = TobiiY * ofGetHeight();
     
     //fbo1.begin();
         ofClear(255, 255, 255, 255);
