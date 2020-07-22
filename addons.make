@@ -1,3 +1,4 @@
+ofxBiquadFilter
 ofxGui
 ofxParagraph
 ofxSmartFont

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		042AB12624C86424002EB40A /* ofxBiquadFilterInstance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042AB11724C86424002EB40A /* ofxBiquadFilterInstance.cpp */; };
+		042AB12724C86424002EB40A /* ofxBiquadFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042AB11824C86424002EB40A /* ofxBiquadFilter.cpp */; };
 		044CE990247D6ACD00429C6C /* libtobii_research.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 044CE98F247D6ACD00429C6C /* libtobii_research.dylib */; };
 		044CE992247D6AD300429C6C /* libtobii_research.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 044CE991247D6AD300429C6C /* libtobii_research.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 907C5B5E104864A2D3A25745 /* ofxToggle.cpp */; };
@@ -40,6 +42,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		042AB11624C86424002EB40A /* ofxBiquadFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBiquadFilter.h; sourceTree = "<group>"; };
+		042AB11724C86424002EB40A /* ofxBiquadFilterInstance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBiquadFilterInstance.cpp; sourceTree = "<group>"; };
+		042AB11824C86424002EB40A /* ofxBiquadFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBiquadFilter.cpp; sourceTree = "<group>"; };
+		042AB11924C86424002EB40A /* ofxBiquadFilterInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBiquadFilterInstance.h; sourceTree = "<group>"; };
 		044CE973247D644900429C6C /* tobii_research.pc */ = {isa = PBXFileReference; lastKnownFileType = text; path = tobii_research.pc; sourceTree = "<group>"; };
 		044CE974247D644900429C6C /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		044CE975247D644900429C6C /* TobiiProSDK_EndUserLicenseAgreement.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = TobiiProSDK_EndUserLicenseAgreement.pdf; sourceTree = "<group>"; };
@@ -282,6 +288,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		042AB0F524C86424002EB40A /* ofxBiquadFilter */ = {
+			isa = PBXGroup;
+			children = (
+				042AB11524C86424002EB40A /* src */,
+			);
+			name = ofxBiquadFilter;
+			path = ../../../addons/ofxBiquadFilter;
+			sourceTree = "<group>";
+		};
+		042AB11524C86424002EB40A /* src */ = {
+			isa = PBXGroup;
+			children = (
+				042AB11624C86424002EB40A /* ofxBiquadFilter.h */,
+				042AB11724C86424002EB40A /* ofxBiquadFilterInstance.cpp */,
+				042AB11824C86424002EB40A /* ofxBiquadFilter.cpp */,
+				042AB11924C86424002EB40A /* ofxBiquadFilterInstance.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		044CE953247D5E6700429C6C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -432,6 +458,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				042AB0F524C86424002EB40A /* ofxBiquadFilter */,
 				480A780D8D0308AE4A368801 /* ofxGui */,
 				2877BAA6CBC8D4E5C28F2D34 /* ofxParagraph */,
 				92CB46D48EC846004FCBE8EF /* ofxSmartFont */,
@@ -878,10 +905,12 @@
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				6E9609E71F8CB565AA215194 /* Paragraph.cpp in Sources */,
 				856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */,
+				042AB12724C86424002EB40A /* ofxBiquadFilter.cpp in Sources */,
 				5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */,
 				853E0BA2F448076739446874 /* ofxColorPicker.cpp in Sources */,
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
 				852E0891794923EE7583C621 /* ofxInputField.cpp in Sources */,
+				042AB12624C86424002EB40A /* ofxBiquadFilterInstance.cpp in Sources */,
 				483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */,
 				F285EB3169F1566CA3D93C20 /* ofxPanel.cpp in Sources */,
 				837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */,

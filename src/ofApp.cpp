@@ -119,6 +119,9 @@ void ofApp::setup()
     tobii.connect();
     
     ofEnableAlphaBlending();
+    
+    filter.setFc(0.011);
+    
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
     
@@ -182,14 +185,17 @@ void ofApp::setup()
 void ofApp::update() {
     
     //pupilZmq.receive();
+    tobii.get_data();
+    
+    x = TobiiX * ofGetWidth();
+    y = TobiiY * ofGetHeight();
+    
+    filter.update(ofVec2f(TobiiX * ofGetWidth(),TobiiY * ofGetHeight()));
 
 }
 
 void ofApp::draw()
 {
-    
-    
-    tobii.get_data();
     
     
     //std::cout << "draw" << std::endl;
@@ -223,8 +229,8 @@ void ofApp::draw()
     //x = mouseX;
     //y = mouseY;
     
-    x = TobiiX * ofGetWidth();
-    y = TobiiY * ofGetHeight();
+    x = filter.value().x;
+    y = filter.value().y;;
     
     //fbo1.begin();
         ofClear(255, 255, 255, 255);

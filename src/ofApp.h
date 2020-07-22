@@ -11,6 +11,8 @@
 #include "Paragraph.hpp"
 #include "ofxGui.h"
 
+#include "ofxBiquadFilter.h"
+
 #include <tobii_research.h>
 #include <tobii_research_streams.h>
 #include <tobii_research_eyetracker.h>
@@ -183,6 +185,9 @@ class ofApp : public ofBaseApp{
         void update();
     
         vector<Paragraph*> paragraphs;
+    
+    
+    ofxBiquadFilter2f filter;
     
     ofShader shader;
     ofPlanePrimitive plane;
