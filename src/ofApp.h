@@ -205,16 +205,12 @@ class ofApp : public ofBaseApp{
     top left 0.36712246520437525,0.6716195969513632
     top right 0.6758969988342477,0.6645489801140543
     */
-    
-    float LEFT_X = 0.42;
+    /*float LEFT_X = 0.42;
     float RIGHT_X = 0.7;
-    
     float TOP_Y = 0.45;
-    float BOTTOM_Y = 0.67;
+    float BOTTOM_Y = 0.67;*/
     //float TOP_RIGHT_Y = 0.6645489801140543;
-    
     //float BOTTOM_LEFT_X = 0.38111690686729993;
-    
     //float BOTTOM_RIGHT_X = 0.685358948107331;
     //float BOTTOM_RIGHT_Y = 0.4051380090533916;
     
@@ -233,7 +229,11 @@ class ofApp : public ofBaseApp{
     ofParameter<float> letterScale;
     
     //ofParameter<float> magnifyDist;
+    
+    ofParameter<float> filterFc;
+    ofParameter<double> filterQ;
 
+    
     ofxPanel gui;
     
 };

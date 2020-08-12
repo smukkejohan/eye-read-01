@@ -111,6 +111,10 @@ void ofApp::setup()
     gui.add(pushTextLeft.set("push left", true));
     gui.add(numMagnifyLetters.set("min letters", 10, 1, 20));
     gui.add(letterScale.set("scale", 4));
+    
+    gui.add(filterFc.set("filterFc", 0.011));
+    gui.add(filterQ.set("filterQ", 0.707));
+    
 
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
@@ -120,7 +124,6 @@ void ofApp::setup()
     
     ofEnableAlphaBlending();
     
-    filter.setFc(0.011);
     
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
@@ -184,12 +187,17 @@ void ofApp::setup()
 
 void ofApp::update() {
     
+
+    
     //pupilZmq.receive();
     tobii.get_data();
     
     x = TobiiX * ofGetWidth();
     y = TobiiY * ofGetHeight();
     
+    
+    filter.setFc(filterFc);
+    filter.setQ(filterQ);
     filter.update(ofVec2f(TobiiX * ofGetWidth(),TobiiY * ofGetHeight()));
 
 }
