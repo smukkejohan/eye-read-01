@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <group>
-	<push_left>1</push_left>
+	<push_left>0</push_left>
 	<min_letters>10</min_letters>
 	<scale>4</scale>
-	<filterFc>0.105273</filterFc>
-	<filterQ>0.245273</filterQ>
+	<filterFc>0.011</filterFc>
+	<filterQ>0.707</filterQ>
+	<use_eye_tracker>0</use_eye_tracker>
+	<letters_left>4</letters_left>
+	<letters_right>15</letters_right>
 </group>

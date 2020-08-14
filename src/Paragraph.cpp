@@ -250,9 +250,7 @@ void Paragraph::render()
         }
     }
     
-    // TODO: Go through words and create index of all letters
     mLetters.clear();
-    mLetterPaths.clear();
     
     float lineY = 0; // mLeading;
 
@@ -267,28 +265,26 @@ void Paragraph::render()
             // we also do not handle ligatures at the moment
             
             std::vector<ofPath> letterPaths =  ttfBig.getStringAsPoints(w->text);
-            
             w->letterPaths = letterPaths;
+            
             float lX = w->rect.getX();
             
             //std::cout<<"Letters: ";
-            
-            /*for(int i=0; i <= ofUTF8Length(w->text); i++) {
+            for(int i=0; i <= ofUTF8Length(w->text); i++) {
                 
                  std::string s = ofUTF8Substring(w->text, i,1);
                  //std::string s(1, c);
                 
-                 ofRectangle b = ttf.getStringBoundingBox(s, lX, 0);
+                 ofRectangle b = ttf.getStringBoundingBox(s, lX, lineY);
                  lX += b.getWidth() + ttf.getLetterSpacing();
-                 b.setY(lineY);
+                 //b.setY(lineY - mLineHeight);
                 
-                 std::cout<<s;
-                 
                  letter newLetter = {s, b};
                  mLetters.push_back(newLetter);
+                 w->letters.push_back(newLetter);
                  
                  //mLetters.push new letter
-             }*/
+             }
             
             /*for(auto &path : letterPaths) {
             
@@ -330,33 +326,61 @@ bool sortWordsByDistance(Paragraph::word & a, Paragraph::word & b){
     }
 }
 
-void Paragraph::drawMagnifiedLetters(float x, float y, int magLetters, bool pushLeft, float scale) { // Scale is 1 to bigFontMult
-    // draw original in red to debug alignment
+// dwell  calculation ... ish
+void Paragraph::calculateAttractPoint(float x, float y) {
     
+    ofVec2f focusPos(x - this->x, y - this->y);
+    
+    // get closest line // NOT necesarily in it TODO
+    // use line to attract Y position
+    for(auto &line : mLines) {
+        
+        ofRectangle lineRect(0,
+        line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
+        mWidth, mLineHeight + (mWordBoundaryPadding * 2));
+        // set rect of last to end at bottom and rect of first to end at top
+           
+        if(lineRect.inside(focusPos)) {
+            // save the current line
+            attractPoint.y = this->y + line.front()->rect.y - mWordBoundaryPadding; //- (mLineHeight + mWordBoundaryPadding)*0.5;
+            
+            // get closest word / letter in line - use centroid.x to attract x position
+            // x axis effect should be less than y axis
+            for (std::size_t i = 0, e = line.size(); i != e; ++i) {
+                auto &w = line.at(i);
+                // Get the closest word
+                if( focusPos.x < w->rect.getX() + w->rect.width ) {
+                    // attractPoint.x = this->x + w->rect.getX() + w->rect.width*0.5; // snap to center of word
+                    attractPoint.x = focusPos.x + this->x;
+                   break;
+                }
+            }
+            break;
+        }
+    }
+    
+    
+
+    
+}
+
+void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, float scale) { // Scale is 1 to bigFontMult
+    // draw original in red to debug alignment
     
     ofPushMatrix();
     ofTranslate(this->x, this->y);
-    
     ofVec2f focusPos(x - this->x, y - this->y);
     
     ofPushStyle();
     
-    std::vector<word*> currentLine;
-    
-    //float lY = 0;
     // first draw lines we dont need to magnify
     for(auto &line : mLines) {
-        
-        // Draw the baseline
-        //ofSetColor(0,0,0);
-        //ofDrawLine(0, lY, mWidth, lY);
-        //lY += mLineHeight + mLeading;
         
         ofRectangle lineRect(0,
         line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
         mWidth, mLineHeight + (mWordBoundaryPadding * 2));
            
-        if( !lineRect.inside(focusPos)) {
+        if(!lineRect.inside(focusPos)) {
             for(auto &w : line) {
                    ofSetColor(50,50,50);
                    ttf.drawString(w->text, w->rect.x, w->rect.y);
@@ -369,15 +393,21 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int magLetters, bool push
     
     // Then take care of the magnified line word by word path by path
     
-    
-    float xOffset = 0;
+    float xOffsetLeft = 0;
+    float xOffsetRight = 0;
+
     float bigWordPadding = mWordBoundaryPadding * bigFontMult;
-    //word* currentWord;
-    int mCount = 0;
 
     std::vector<word*> wordsBefore;
     std::vector<word*> wordsAfter;
     std::vector<word*> wordsMagnify;
+    
+    std::string magnifyStr;
+    
+    ofVec2f magnifyPos = ofVec2f(0,0);
+    
+    ofRectangle magnifyBounding;
+
         
     for (std::size_t i = 0, e = currentLine.size(); i != e; ++i) {
         auto &w = currentLine.at(i);
@@ -387,31 +417,94 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int magLetters, bool push
             w->rect.width + (mWordBoundaryPadding * 2),
             mLineHeight + (mWordBoundaryPadding * 2));
         
-        ofRectangle restRect(w->rect.x - w->rect.width - mWordBoundaryPadding,0,
-           mWidth, mHeight);
-                
-        if( focusPos.x < w->rect.getX() + w->rect.width ) {
+        bool before = true;
+        
+        if( r.inside(focusPos) ) {
             
-            // magnify minimum 10 ligatures/letters
-            if(mCount < magLetters /*&& (i+1) < currentLine.size()*/) {
-                
-                ofRectangle bigBounding = ttfBig.getStringBoundingBox(w->text, r.x, w->rect.y);
-                if(pushLeft) {
-                    xOffset -= bigBounding.width - r.width + bigWordPadding;
+            for (std::size_t ii = 0, e = w->letters.size(); ii != e; ++ii) {
+                auto l = w->letters.at(ii);
+                if( l.rect.inside(focusPos) ) {
+                    
+                    magnifyStr = l.text;
+                    magnifyPos.y = w->rect.y + mWordBoundaryPadding ;
+                    
+                    int letterCount = 0;
+                    int wordIndex = i;
+                    int letterIndex = ii;
+                    
+                    while(letterCount < numLettersLeft) {
+                        // Add letters before
+                        // Get in words, break if line ends
+                        letterIndex--;
+                        
+                        if( letterIndex >= 0) {
+                            magnifyStr = currentLine.at(wordIndex)->letters.at(letterIndex).text + magnifyStr;
+                            letterCount++;
+                            
+                        } else {
+                            // get word before
+                            wordIndex--;
+                            if(wordIndex < 0) {
+                                break;
+                            } else {
+                                letterIndex = currentLine.at(wordIndex)->letters.size();
+                                magnifyStr = " " + magnifyStr;
+                            }
+                        }
+                    }
+                    
+                    xOffsetLeft = ttfBig.getStringBoundingBox(magnifyStr, 0, 0).width;
+                    magnifyPos.x = l.rect.getPosition().x - xOffsetLeft;
+                    
+                    
+                    letterCount = 0;
+                    wordIndex = i;
+                    letterIndex = ii + 1;
+                    
+                    while(letterCount < numLettersRight) {
+                        // Add letters after
+                        // Get in words, break if line ends
+                        
+                        if( letterIndex < currentLine.at(wordIndex)->letters.size() ) {
+                            magnifyStr = magnifyStr + currentLine.at(wordIndex)->letters.at(letterIndex).text;
+                            letterIndex++;
+                            letterCount++;
+                            
+                        } else {
+                            // get word after
+                            wordIndex++;
+                            if(wordIndex >= currentLine.size()) {
+                                break;
+                            } else {
+                                letterIndex = 0;
+                                magnifyStr = magnifyStr + " ";
+                            }
+                        }
+                    }
+                    
+                    
+                    magnifyBounding = ttfBig.getStringBoundingBox(magnifyStr, magnifyPos.x, magnifyPos.y);
+                    
+                    xOffsetRight = magnifyBounding.x + xOffsetLeft;
+
+                    
+                    before = false;
+                    
+                // debug
+                //ttf.drawString(letter.text, letter.rect.x, letter.rect.y);
+                //ofDrawRectangle(l.rect);
                 }
+            }
                 
-                if(w->letterPaths.size() + mCount > magLetters) {
-                    // TODO: option paths of word to hit 10 letters/ligatures
-                } // else - take a whole word more
-                
-                wordsMagnify.insert(wordsMagnify.begin(),w);
-                mCount += w->letterPaths.size();
-                
-                
+        } else {
+            
+            if(before) {
+                wordsBefore.push_back(w);
             } else {
                 wordsAfter.push_back(w);
+
             }
-            
+        }
             /*ofPushMatrix();
             ofTranslate(wordRect.x + wordRect.width/2, w->rect.y);
             ofScale(_s, _s);
@@ -426,64 +519,47 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int magLetters, bool push
             //ofSetColor(0,0,0);
             //ttfBig.drawString(w->text, r.x - (bigBounding.width - r.width) , w->rect.y);
 
-            for(auto &path : w->letterPaths) {
-                //path.draw( r.x - (bigBounding.width - r.width) , w->rect.y);
-            }
-            
-         } else {
+         /*} else {
              wordsBefore.push_back(w);
-         }
+         }*/
+        
     }
     
 
     
     for(auto &w : wordsBefore) {
         ofSetColor(0,0,0);
-        ttf.drawString(w->text, w->rect.x + xOffset, w->rect.y);
+        
+        // draw to left of magnify
+        
+        
+        ttf.drawString(w->text, w->rect.x- (focusPos.x-magnifyBounding.getLeft()) , w->rect.y);
     }
     
     for(auto &w : wordsAfter) {
         ofSetColor(0,0,0);
-        ttf.drawString(w->text, w->rect.x, w->rect.y);
+        
+        // magnifyBounding.getRight()
+         // draw to right of magnify
+        ttf.drawString(w->text, w->rect.x + (focusPos.x - magnifyBounding.getRight()), w->rect.y);
     }
-    
 
-    float magnifyXOffset = 0;
     
-    for(auto &w : wordsMagnify) { // from last
-        
-        ofRectangle r(w->rect.x - mWordBoundaryPadding,
-            w->rect.y - mLineHeight - mWordBoundaryPadding,
-            w->rect.width + (mWordBoundaryPadding * 2),
-            mLineHeight + (mWordBoundaryPadding * 2));
-
-        ofRectangle bigBounding = ttfBig.getStringBoundingBox(w->text, r.x, w->rect.y);
-        
-        magnifyXOffset += bigBounding.width - r.width + bigWordPadding;
-        
-        ofRectangle bigR(r.x - (magnifyXOffset + bigWordPadding), w->rect.y - (bigBounding.height + bigWordPadding), bigBounding.width + bigWordPadding*2, bigBounding.height + bigWordPadding*2);
-        
-        // draw white bacground behind magnified
-        ofSetColor(255,255,255);
-        ofDrawRectangle(bigR);
-        
-        ofSetColor(0,0,0);
-        ttfBig.drawString(w->text, r.x - magnifyXOffset, w->rect.y);
-        
-        //magnifyXOffset += bigBounding.width ;
-        
-        //ttf.drawString(w->text, w->rect.x, w->rect.y);
-    }
+    // draw white bacground behind magnified
+    ofSetColor(255,0,255, 0.5);
+    ofDrawRectangle(magnifyBounding);
     
-
+    ofSetColor(0,0,0);
+    ttfBig.drawString(magnifyStr, magnifyPos.x, magnifyPos.y);
+    //}
+    
+    
     
     ofPopStyle();
-    
     /*ofPushStyle();
     for(auto &l : mLetters) {
         ofSetColor(0,0,200);
         ttf.drawString(l.text , this->x + l.rect.x, this->y + l.rect.y );
-        
     }
     ofPopStyle();*/
     
@@ -652,5 +728,12 @@ void Paragraph::drawNearestWord(float x, float y) {
         }
     }
 }
+
+
+void Paragraph::getLetterCentroid(float x, float y) {
+    
+}
+
+
 
 

@@ -106,13 +106,18 @@ void ofApp::setup()
     ofSetFrameRate(240);
 
     gui.setup();
-    //gui.add(bUseEyeTracker.set("use eye tracker", bUseEyeTracker));
+    gui.add(bUseEyeTracker.set("use eye tracker", false));
     
-    gui.add(pushTextLeft.set("push left", true));
-    gui.add(numMagnifyLetters.set("min letters", 10, 1, 20));
+    gui.add(pushText.set("push", true));
+    
+    gui.add(numLettersLeft.set("letters left", 4, 0, 20));
+    
+    gui.add(numLettersRight.set("letters right", 15, 0, 30));
+    
     gui.add(letterScale.set("scale", 4));
     
     gui.add(filterFc.set("filterFc", 0.011));
+    
     gui.add(filterQ.set("filterQ", 0.707));
     
 
@@ -169,7 +174,7 @@ void ofApp::setup()
     paragraphs[0]->setFont("Helvetica", pFontSize);
     //ofxSmartFont::list();
     
-    int pLeading = pFontSize*.65;
+    int pLeading = pFontSize*.85; // 0.65
     int tWidth = paragraphs.size()*pWidth + (paragraphs.size()-1)*pPadding;
     
     int x = (ofGetWidth() - tWidth)/2;
@@ -187,18 +192,26 @@ void ofApp::setup()
 
 void ofApp::update() {
     
+    if(bUseEyeTracker) {
+        //pupilZmq.receive();
+        tobii.get_data();
+        
+        rawx = TobiiX * ofGetWidth();
+        rawy = TobiiY * ofGetHeight();
+        
+    } else {
+        
+        rawx = mouseX;
+        rawy = mouseY;
+    }
 
-    
-    //pupilZmq.receive();
-    tobii.get_data();
-    
-    x = TobiiX * ofGetWidth();
-    y = TobiiY * ofGetHeight();
-    
-    
     filter.setFc(filterFc);
     filter.setQ(filterQ);
-    filter.update(ofVec2f(TobiiX * ofGetWidth(),TobiiY * ofGetHeight()));
+    
+    //paragraphs[0]->getLetterCentroid(x, y);
+    paragraphs[0]->calculateAttractPoint(rawx, rawy);
+    
+    filter.update(ofVec2f( rawx, rawy ).getInterpolated(paragraphs[0]->attractPoint, 0.9) );
 
 }
 
@@ -249,7 +262,7 @@ void ofApp::draw()
         ofSetColor(255);
         //paragraphs[0]->draw();
         //paragraphs[0]->drawMagnified1(x, y, 4);
-        paragraphs[0]->drawMagnifiedLetters(x, y, numMagnifyLetters, pushTextLeft, letterScale);
+        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, letterScale);
         //ofDrawCircle(x, y, 10);
 
         //}
@@ -284,7 +297,11 @@ void ofApp::draw()
     
     ofSetColor(0);
     ofDrawCircle(x, y, 10);
+            
+    ofSetColor(255,0,0);
+    ofDrawCircle(paragraphs[0]->attractPoint, 8);
     
+    ofSetColor(255);
     gui.draw();
     
 }

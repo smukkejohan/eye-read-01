@@ -12,6 +12,42 @@
 class Paragraph{
     
     public:
+    
+        struct letter {
+               std::string text;
+               ofRectangle rect;
+               ofPath path;
+               
+               float _xDist;
+               float _yDist;
+               float pushOut;
+        };
+    
+        /*struct letterPath {
+        
+            ofPath path;
+            std::string text;
+            ofRectangle rect;
+               
+            float _xDist;
+            float _yDist;
+            float pushOut;
+        };*/
+    
+        struct word {
+            std::string text;
+            ofRectangle rect;
+            
+            std::vector<ofPath> letterPaths;
+            std::vector<letter> letters;
+            
+            //float xOffset;
+            // Deprecate
+            float _xDist;
+            float _yDist;
+            float pushOut;
+        };
+    
 
         enum Alignment
         {
@@ -44,11 +80,17 @@ class Paragraph{
         int getHeight();
         int getStringHeight(std::string str = "");
         
-    
         void drawLetterAtPos(float x, float y);
     
         void drawMagnified1(float x, float y, float scale=4);
-        void drawMagnifiedLetters(float x, float y, int magLetters=10, bool pushLeft=true, float scale=4);
+    
+        void calculateAttractPoint(float x, float y);
+
+        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, float scale=4);
+    
+        ofVec2f attractPoint;
+    
+        void getLetterCentroid(float x, float y);
     
         void drawNearestWord(float x, float y);
 
@@ -58,44 +100,7 @@ class Paragraph{
         void drawBorder(ofColor color);
         void drawWordBoundaries(bool draw = true);
     
-        
-        struct letter {
-               std::string text;
-               ofRectangle rect;
-               ofPath path;
-               
-               float _xDist;
-               float _yDist;
-               float pushOut;
-        };
     
-    struct letterPath {
-        
-        ofPath path;
-        std::string text;
-        ofRectangle rect;
-           
-        float _xDist;
-        float _yDist;
-        float pushOut;
-    };
-    
-    
-    
-        struct word {
-            std::string text;
-            ofRectangle rect;
-            
-            std::vector<ofPath> letterPaths;
-            
-            //float xOffset;
-            
-            // Deprecate
-            float _xDist;
-            float _yDist;
-            float pushOut;
-            
-        };
     
     
     /*struct bigWord {
@@ -135,10 +140,13 @@ class Paragraph{
         ofColor mWordBoundaryColor;
     
         std::vector< letter > mLetters;
-        std::vector< letterPath > mLetterPaths;
+        //std::vector< letterPath > mLetterPaths;
     
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
+        std::vector< word*> currentLine;
+
+
     
         void render();
         inline void drawLeftAligned();
