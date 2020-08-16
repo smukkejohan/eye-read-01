@@ -101,8 +101,6 @@ class Paragraph{
         void drawWordBoundaries(bool draw = true);
     
     
-    
-    
     /*struct bigWord {
         std::string text;
         ofRectangle rect;
@@ -145,8 +143,6 @@ class Paragraph{
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
-
-
     
         void render();
         inline void drawLeftAligned();
@@ -158,9 +154,4 @@ class Paragraph{
             s.erase(std::find_if(s.rbegin(), s.rend(), [](char c) {return !isspace(c); }).base(), s.end());
             return s;
         }
-    
 };
-
-
-
-
