@@ -427,10 +427,10 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
             mLineHeight*4 + (mWordBoundaryPadding * 2));
         
         ofSetColor(255,100,255);
-        ofNoFill();
+        /*ofNoFill();
         ofDrawRectangle(r);
         ofFill();
-        
+        */
         /*ofFill();
         ofSetColor(30,30,30);
         ttf.drawString(w->text, w->rect.x, w->rect.y);
@@ -546,7 +546,7 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                     
                 // debug
                 //ttf.drawString(letter.text, letter.rect.x, letter.rect.y);
-                ofDrawRectangle(l.rect);
+                //ofDrawRectangle(l.rect);
                 }
             }
             
