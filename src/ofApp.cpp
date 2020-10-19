@@ -106,6 +106,7 @@ void ofApp::setup()
     ofSetFrameRate(240);
 
     gui.setup();
+    
     gui.add(bUseEyeTracker.set("use eye tracker", false));
     
     gui.add(pushText.set("push", true));
@@ -305,8 +306,15 @@ void ofApp::draw()
     ofSetColor(255,0,0);
     ofDrawCircle(paragraphs[0]->attractPoint, 8);
     
+    
+    ofSetColor(0);
+
+    ofDrawBitmapString(ofGetFrameRate(), ofGetWidth()-80, ofGetHeight()-40);
+    
     ofSetColor(255);
     gui.draw();
+    
+    
     
 }
 
