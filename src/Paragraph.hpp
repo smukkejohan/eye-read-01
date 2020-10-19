@@ -86,7 +86,7 @@ class Paragraph{
     
         void calculateAttractPoint(float x, float y);
 
-        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, float scale=4);
+        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, float scale=4, bool magnifyWholeWords=true);
     
         ofVec2f attractPoint;
     

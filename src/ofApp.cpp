@@ -110,6 +110,8 @@ void ofApp::setup()
     
     gui.add(pushText.set("push", true));
     
+    gui.add(magnifyWholeWords.set("Whole words", true));
+    
     gui.add(numLettersLeft.set("letters left", 4, 0, 20));
     
     gui.add(numLettersRight.set("letters right", 15, 0, 30));
@@ -125,7 +127,9 @@ void ofApp::setup()
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
     //pupilZmq.connect();
     
-    tobii.connect();
+    if(bUseEyeTracker) {
+        tobii.connect();
+    }
     
     ofEnableAlphaBlending();
     
@@ -262,7 +266,7 @@ void ofApp::draw()
         ofSetColor(255);
         //paragraphs[0]->draw();
         //paragraphs[0]->drawMagnified1(x, y, 4);
-        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, letterScale);
+        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, letterScale, magnifyWholeWords);
         //ofDrawCircle(x, y, 10);
 
         //}

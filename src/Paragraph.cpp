@@ -364,7 +364,7 @@ void Paragraph::calculateAttractPoint(float x, float y) {
     
 }
 
-void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, float scale) { // Scale is 1 to bigFontMult
+void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, float scale, bool magnifyWholeWords) { // Scale is 1 to bigFontMult
     // draw original in red to debug alignment
     
     ofPushMatrix();
@@ -436,9 +436,8 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
         ttf.drawString(w->text, w->rect.x, w->rect.y);
         */
         
-        
         if( r.inside(focusPos) && !currentWordFound) {
-            currentWordFound;
+            currentWordFound = true;
             
             bool currentLetterFound = false;
             
@@ -457,7 +456,20 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                     int wordIndex = i;
                     int letterIndex = ii;
                     
-                    while(letterCount < numLettersLeft /*|| letterIndex > 0 */) { // whole words ?
+                    bool drawLeft = true;
+                    
+                    while(drawLeft) {
+                        
+                        if(letterCount >= numLettersLeft) {
+                            if(magnifyWholeWords) {
+                                if(letterIndex == 0) {
+                                    drawLeft = false;
+                                }
+                            } else {
+                                drawLeft = false;
+                            }
+                        }
+                        
                         // Add letters before
                         // Get in words, break if line ends
                         letterIndex--;
@@ -466,11 +478,13 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                             letterCount++;
                             
                         } else {
+
                             // get word before
                             wordIndex--;
                             if(wordIndex < 0) {
                                 break;
                             } else {
+                                
                                 letterIndex = currentLine.at(wordIndex)->letters.size();
                                 magnifyStr = " " + magnifyStr;
                             }
@@ -500,9 +514,19 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                     wordIndex = i;
                     letterIndex = ii + 1;
                     
-                    while(letterCount < numLettersRight) {
+                    bool drawRight = true;
+                    while(drawRight) {
                         // Add letters after
                         // Get in words, break if line ends
+                        if(letterCount >= numLettersRight) {
+                            if(magnifyWholeWords) {
+                                if(letterIndex == currentLine.at(wordIndex)->letters.size() ) {
+                                    drawRight = false;
+                                }
+                            } else {
+                                drawRight = false;
+                            }
+                        }
                         
                         if( letterIndex < currentLine.at(wordIndex)->letters.size() ) {
                             magnifyStr = magnifyStr + currentLine.at(wordIndex)->letters.at(letterIndex).text;

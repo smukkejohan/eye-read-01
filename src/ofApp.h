@@ -6,6 +6,8 @@
 //  https://github.com/braitsch/ofxParagraph
 //
 
+//#define USE_TOBII_TRACKER false
+
 #pragma once
 #include "ofMain.h"
 #include "Paragraph.hpp"
@@ -227,6 +229,7 @@ class ofApp : public ofBaseApp{
     //ofParameter<string> screenSize;
     
     ofParameter<bool> pushText;
+    ofParameter<bool> magnifyWholeWords;
     
     ofParameter<int> numLettersLeft;
     ofParameter<int> numLettersRight;

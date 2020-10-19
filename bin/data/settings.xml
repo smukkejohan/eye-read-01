@@ -6,6 +6,8 @@
 	<filterFc>0.011</filterFc>
 	<filterQ>0.707</filterQ>
 	<use_eye_tracker>0</use_eye_tracker>
-	<letters_left>4</letters_left>
+	<letters_left>2</letters_left>
 	<letters_right>15</letters_right>
+	<push>1</push>
+	<Whole_words>1</Whole_words>
 </group>
