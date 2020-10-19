@@ -117,7 +117,9 @@ void ofApp::setup()
     
     gui.add(numLettersRight.set("letters right", 15, 0, 30));
     
-    gui.add(letterScale.set("scale", 4));
+    /*gui.add(magnifyScale.set("mag scale", 4, 1.0, 8.0));
+    magnifyScale.addListener(this, &ofApp::magScaleChanged);
+    */
     
     gui.add(filterFc.set("filterFc", 0.011));
     
@@ -155,7 +157,8 @@ void ofApp::setup()
     ofBackground(ofColor::white);
     ofSetFullscreen(true);
 
-        Paragraph* p = new Paragraph(text1);
+    Paragraph* p = new Paragraph(text1);
+    
         p->setColor(ofColor::fromHex(0x555555));
         //p->drawBorder(ofColor::fromHex(0x777777));
         //p->drawWordBoundaries();
@@ -164,7 +167,7 @@ void ofApp::setup()
         paragraphs.push_back(p);
 
 // change these to whatever you want //
-    int pWidth = ofGetScreenWidth() - 600;
+    int pWidth = 600;
     int pFontSize = 14;
     float pPadding = pWidth*.30;
 
@@ -267,7 +270,7 @@ void ofApp::draw()
         ofSetColor(255);
         //paragraphs[0]->draw();
         //paragraphs[0]->drawMagnified1(x, y, 4);
-        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, letterScale, magnifyWholeWords);
+        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
         //ofDrawCircle(x, y, 10);
 
         //}

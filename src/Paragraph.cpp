@@ -18,7 +18,7 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
 , bDrawWordBoundaries(false)
 , mWordBoundaryPadding(2)
 , mWordBoundaryColor(ofColor::red)
-, bigFontMult(4)
+, magnifyScale(4)
 {
     setText(text);
     setAlignment(align);
@@ -165,15 +165,15 @@ void Paragraph::setAlignment(Alignment align)
     render();
 }*/
 
+
 void Paragraph::setFont(std::string file, int size)
 {
     //mFont = ofxSmartFont::add(file, size, name);
     // increase dpi to get smooth shapes ?
-    ttf.load(file, size, true, true, true, 0.3f, 96); // default 96
-    ttfBig.load(file, size*bigFontMult, true, true, true, 0.3f, 96/**bigFontMult*/); // poor anti aliasing of scaled down ig text ??
+    ttf.load(file, size, true, true, true, 0.3f, 96);
+    ttfBig.load(file, size*magnifyScale, true, true, true, 0.3f, 96); // poor anti aliasing of scaled down ig text ??
     
-    // Set spacing when scaling up 
-
+    // Set spacing when scaling up
     render();
 }
 
@@ -364,7 +364,7 @@ void Paragraph::calculateAttractPoint(float x, float y) {
     
 }
 
-void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, float scale, bool magnifyWholeWords) { // Scale is 1 to bigFontMult
+void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, bool magnifyWholeWords) { // Scale is 1 to magnifyScale
     // draw original in red to debug alignment
     
     ofPushMatrix();
@@ -396,7 +396,7 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
     float xOffsetLeft = 0;
     float xOffsetRight = 0;
 
-    float bigWordPadding = mWordBoundaryPadding * bigFontMult;
+    float bigWordPadding = mWordBoundaryPadding * magnifyScale;
     
     std::vector<word*> wordsBefore;
     std::vector<word*> wordsAfter;
@@ -415,9 +415,7 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
     bool before = true;
     
     float spaceWidthPx = ttf.getStringBoundingBox("a", 0, 0).width * 0.25;
-    
-    bool currentWordFound = false;
-    
+        
     for (std::size_t i = 0, eL = currentLine.size(); i != eL; ++i) {
         auto &w = currentLine.at(i);
         
@@ -436,8 +434,8 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
         ttf.drawString(w->text, w->rect.x, w->rect.y);
         */
         
-        if( r.inside(focusPos) && !currentWordFound) {
-            currentWordFound = true;
+        if( r.inside(focusPos)) {
+            currentWord = w;
             
             bool currentLetterFound = false;
             
@@ -562,8 +560,6 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                         }
                     }
                     
-
-                    
                     magnifyBounding = ttfBig.getStringBoundingBox(magnifyStr, magnifyPos.x, magnifyPos.y);
                     xOffsetRight = magnifyBounding.width - xOffsetLeft;
                     before = false;
@@ -573,7 +569,6 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
                 //ofDrawRectangle(l.rect);
                 }
             }
-            
                 
         } else {
             /*if(before) {
@@ -583,8 +578,12 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
             }*/
         }
         
-        
-        
+    }
+    
+    
+    if(!push) {
+        xOffsetRight = 0;
+        xOffsetLeft = 0;
     }
     
     if(currentLine.size() > 0 ) {
@@ -618,7 +617,6 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
            ttfBig.drawString(magnifyStr, magnifyPos.x, magnifyPos.y);
            //}
            
-           
            /*ofPushStyle();
            for(auto &l : mLetters) {
                ofSetColor(0,0,200);
@@ -637,15 +635,15 @@ void Paragraph::drawMagnifiedLetters(float x, float y, int numLettersLeft, int n
     
     ofPopStyle();
     ofPopMatrix();
-   
 }
+
 
 
 
 void Paragraph::drawMagnified1(float x, float y, float scale) { // Scale is 1 to bigFontMult
     
     float maxDist = 400;
-    float bigWordPadding = mWordBoundaryPadding * bigFontMult;
+    float bigWordPadding = mWordBoundaryPadding * magnifyScale;
     ofVec2f focusPos(x - this->x, y - this->y);
     
     for(auto &w : mWords) {

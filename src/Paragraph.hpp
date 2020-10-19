@@ -63,6 +63,8 @@ class Paragraph{
     
         void setText(std::string text);
         void setFont(std::string file, int ptSize);
+    
+        // void setMagScale() TODO
         //void setFont(std::shared_ptr<ofxSmartFont> font);
     
         void setColor(int color);
@@ -86,7 +88,7 @@ class Paragraph{
     
         void calculateAttractPoint(float x, float y);
 
-        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, float scale=4, bool magnifyWholeWords=true);
+        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, bool magnifyWholeWords=true);
     
         ofVec2f attractPoint;
     
@@ -114,7 +116,7 @@ class Paragraph{
     
     private:
         
-        int bigFontMult;
+        int magnifyScale;
     
         int mWidth;
         int mHeight;
@@ -143,6 +145,7 @@ class Paragraph{
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
+        word* currentWord;
     
         void render();
         inline void drawLeftAligned();

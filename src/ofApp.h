@@ -185,6 +185,10 @@ class ofApp : public ofBaseApp{
 		void draw();
         void update();
     
+    void magScaleChanged(float & value) {
+        //paragraphs[0]->setFont("Helvetica", pFontSize, value);
+    }
+    
         vector<Paragraph*> paragraphs;
     
     
@@ -234,7 +238,8 @@ class ofApp : public ofBaseApp{
     ofParameter<int> numLettersLeft;
     ofParameter<int> numLettersRight;
     
-    ofParameter<float> letterScale;
+    ofParameter<float> magnifyScale;
+    
     
     //ofParameter<float> magnifyDist;
     
