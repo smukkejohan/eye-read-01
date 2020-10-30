@@ -73,12 +73,14 @@ public:
         
         if (status != TOBII_RESEARCH_STATUS_OK) {
               printf("ERROR: %d when trying to get eyetracker!\n", status);
-              exit(EXIT_FAILURE);
+              throw "ERROR when trying to get eyetracker!";
+              //exit(EXIT_FAILURE);
           }
         tobii_research_get_address(eyetracker, &device_address);
         if (status != TOBII_RESEARCH_STATUS_OK) {
               printf("ERROR: %d when trying to get address!\n", status);
-              exit(EXIT_FAILURE);
+              throw "ERROR when trying to get eyetracker!";
+              //exit(EXIT_FAILURE);
         }
         
         TobiiResearchGazeData gaze_data;
@@ -86,7 +88,8 @@ public:
         
         if (status != TOBII_RESEARCH_STATUS_OK) {
             printf("ERROR: %d when trying to get address!\n", status);
-            exit(EXIT_FAILURE);
+            //exit(EXIT_FAILURE);
+            throw "ERROR when trying to get eyetracker!";
         }
         /*
         printf("Left eye 2D gaze point on display area: (%f, %f)\n",

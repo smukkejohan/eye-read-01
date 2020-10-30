@@ -104,10 +104,9 @@ void ofApp::setup()
     ofEnableAntiAliasing();
     ofEnableSmoothing();
     ofSetFrameRate(240);
-
-    gui.setup();
     
-    gui.add(bUseEyeTracker.set("use eye tracker", false));
+    gui.setup();
+    gui.add(bUseEyeTracker.set("use eye tracker", true));
     
     gui.add(pushText.set("push", true));
     
@@ -131,7 +130,12 @@ void ofApp::setup()
     //pupilZmq.connect();
     
     if(bUseEyeTracker) {
-        tobii.connect();
+        try {
+            tobii.connect();
+        } catch(const char* msg) {
+            std::cout<<msg<<" Using mouse position as input."<<std::endl;
+            bUseEyeTracker.set(false);
+        }
     }
     
     ofEnableAlphaBlending();
@@ -218,8 +222,13 @@ void ofApp::update() {
     
     //paragraphs[0]->getLetterCentroid(x, y);
     paragraphs[0]->calculateAttractPoint(rawx, rawy);
-    
     filter.update(ofVec2f( rawx, rawy ).getInterpolated(paragraphs[0]->attractPoint, 0.9) );
+    
+    x = filter.value().x;
+    y = filter.value().y;
+    
+    paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
+
 
 }
 
@@ -258,9 +267,6 @@ void ofApp::draw()
     //x = mouseX;
     //y = mouseY;
     
-    x = filter.value().x;
-    y = filter.value().y;;
-    
     //fbo1.begin();
         ofClear(255, 255, 255, 255);
 
@@ -270,7 +276,7 @@ void ofApp::draw()
         ofSetColor(255);
         //paragraphs[0]->draw();
         //paragraphs[0]->drawMagnified1(x, y, 4);
-        paragraphs[0]->drawMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
+        paragraphs[0]->drawMagnifiedLetters(x, y, pushText, magnifyWholeWords);
         //ofDrawCircle(x, y, 10);
 
         //}

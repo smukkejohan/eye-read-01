@@ -87,13 +87,14 @@ class Paragraph{
         void drawMagnified1(float x, float y, float scale=4);
     
         void calculateAttractPoint(float x, float y);
-
-        void drawMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, bool magnifyWholeWords=true);
     
+        void calculateMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, bool magnifyWholeWords=true);
+        void drawMagnifiedLetters(float x, float y, bool pushLeft=true, bool magnifyWholeWords=true);
+    
+        // void drawSegments
         ofVec2f attractPoint;
-    
+        
         void getLetterCentroid(float x, float y);
-    
         void drawNearestWord(float x, float y);
 
         void draw();
@@ -131,7 +132,6 @@ class Paragraph{
         ofTrueTypeFont ttf;
         ofTrueTypeFont ttfBig;
 
-    
         bool bDrawBorder;
         ofColor mBorderColor;
         int mBorderPadding;
@@ -146,6 +146,42 @@ class Paragraph{
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
         word* currentWord;
+    
+        // animation variables
+        float next_xOffsetLeft = 0;
+        float next_xOffsetRight = 0;
+    
+        float draw_xOffsetLeft = 0;
+        float draw_xOffsetRight = 0;
+    
+        std::vector<word*> next_wordsBefore;
+        std::vector<word*> next_wordsAfter;
+        //std::vector<word*> next_wordsMagnify;
+    
+        std::vector<word*> draw_wordsBefore;
+        std::vector<word*> draw_wordsAfter;
+        //std::vector<word*> draw_wordsMagnify;
+        
+        int next_leftWordX = 0;
+        int next_rightWordX = 0;
+        int draw_leftWordX = 0;
+        int draw_rightWordX = 0;
+    
+        std::string next_leftLettersStr = "";
+        std::string next_rightLettersStr = "";
+        std::string next_magnifyStr = "";
+        ofVec2f next_magnifyPos = ofVec2f(0,0);
+    
+     ofRectangle next_magnifyBounding;
+    
+        std::string draw_leftLettersStr = "";
+        std::string draw_rightLettersStr = "";
+        std::string draw_magnifyStr = "";
+        ofVec2f draw_magnifyPos = ofVec2f(0,0);
+    
+     ofRectangle draw_magnifyBounding;
+    
+    float spaceWidthPx;
     
         void render();
         inline void drawLeftAligned();
