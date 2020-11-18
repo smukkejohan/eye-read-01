@@ -85,8 +85,16 @@ class Paragraph{
         void drawLetterAtPos(float x, float y);
     
         void drawMagnified1(float x, float y, float scale=4);
+        
+        //
+        void drawScrollingLine();
+        void calculateScrollingLine(float x, float y);
+        double scrollIn = 0;
+        //
     
         void calculateAttractPoint(float x, float y);
+    
+    void calculateAttractPointScrolling(float x, float y);
     
         void calculateMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, bool magnifyWholeWords=true);
         void drawMagnifiedLetters(float x, float y, bool pushLeft=true, bool magnifyWholeWords=true);
@@ -118,6 +126,7 @@ class Paragraph{
     private:
         
         int magnifyScale;
+    int DPI_SCALE_FACTOR = 20;
     
         int mWidth;
         int mHeight;

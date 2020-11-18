@@ -214,15 +214,17 @@ void ofApp::update() {
     filter.setQ(filterQ);
     
     //paragraphs[0]->getLetterCentroid(x, y);
-    paragraphs[0]->calculateAttractPoint(rawx, rawy);
+    paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     filter.update(ofVec2f( rawx, rawy ).getInterpolated(paragraphs[0]->attractPoint, 0.9) );
     
     x = filter.value().x;
     y = filter.value().y;
     
-    paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
+    //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
 
-
+    paragraphs[0]->calculateScrollingLine(x, y);
+    
+    
 }
 
 void ofApp::draw()
@@ -269,7 +271,11 @@ void ofApp::draw()
         ofSetColor(255);
         //paragraphs[0]->draw();
         //paragraphs[0]->drawMagnified1(x, y, 4);
-        paragraphs[0]->drawMagnifiedLetters(x, y, pushText, magnifyWholeWords);
+        //paragraphs[0]->drawMagnifiedLetters(x, y, pushText, magnifyWholeWords);
+        
+        paragraphs[0]->drawScrollingLine();
+        
+    //paragraphs[0]->draw();
         //ofDrawCircle(x, y, 10);
 
         //}
