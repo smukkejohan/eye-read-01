@@ -1,10 +1,4 @@
 
-//
-//  ofxParagraphExample
-//
-//  Created by Stephen Braitsch on 9/17/15
-//  https://github.com/braitsch/ofxParagraph
-//
 
 //#define USE_TOBII_TRACKER false
 

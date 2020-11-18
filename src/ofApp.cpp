@@ -1,11 +1,4 @@
 
-//
-//  ofxParagraphExample
-//
-//  Created by Stephen Braitsch on 9/17/15
-//  https://github.com/braitsch/ofxParagraph
-//
-
 #include "ofApp.h"
 
 float TobiiX = 0;
