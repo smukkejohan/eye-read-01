@@ -172,8 +172,27 @@ void Paragraph::setFont(std::string file, int size)
 {
     //mFont = ofxSmartFont::add(file, size, name);
     // increase dpi to get smooth shapes ?
-    ttf.load(file, size, true, true, true, 0.1f, 96);
-    ttfBig.load(file, size*magnifyScale, true, true, true, 0.01f, 96*DPI_SCALE_FACTOR); // poor anti aliasing of scaled down ig text ??
+    
+    ofTrueTypeFontSettings settings(file, size);
+    settings.addRange(ofUnicode::Latin);
+    settings.antialiased = true;
+    settings.contours = true;
+    settings.simplifyAmt = 0.01f;
+    settings.dpi = 96;
+    
+    ttf.load(settings);
+    
+    ofTrueTypeFontSettings bigSettings(file, size*magnifyScale);
+    bigSettings.addRange(ofUnicode::Latin);
+    bigSettings.antialiased = true;
+    bigSettings.contours = true;
+    bigSettings.simplifyAmt = 0.01f;
+    bigSettings.dpi = 96*DPI_SCALE_FACTOR;
+    
+    ttfBig.load(bigSettings);
+    
+    //ttf.load(file, size, true, true, true, 0.1f, 96);
+    //ttfBig.load(file, size*magnifyScale, true, true, true, 0.01f, 96*DPI_SCALE_FACTOR); // poor anti aliasing of scaled down ig text ??
     
     // Set spacing when scaling up
     render();

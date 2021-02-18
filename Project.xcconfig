@@ -17,8 +17,4 @@ OTHER_CFLAGS = $(OF_CORE_CFLAGS)
 OTHER_LDFLAGS = $(OF_CORE_LIBS) $(OF_CORE_FRAMEWORKS)
 HEADER_SEARCH_PATHS = $(OF_CORE_HEADERS)
 
-DYLD_LIBRARY_PATH=/usr/local/lib/tobii_research
-
-//CXXFLAGS += -I/usr/local/include
-//LDFLAGS += -L/usr/local/lib/tobii_research -ltobii_research
-
+DYLD_LIBRARY_PATH=$(PROJECT_DIR)/lib/TobiiPro/64/lib

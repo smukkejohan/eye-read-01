@@ -1,4 +1,2 @@
 ofxBiquadFilter
 ofxGui
-ofxParagraph
-ofxSmartFont
