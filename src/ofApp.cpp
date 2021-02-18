@@ -117,6 +117,8 @@ void ofApp::setup()
     
     gui.add(filterQ.set("filterQ", 0.707));
     
+    gui.add(lineChangeDwellMs.set("Vertival dwell millis", 600, 0, 3000));
+    
 
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
@@ -197,6 +199,7 @@ void ofApp::setup()
 
 void ofApp::update() {
     
+    
     if(bUseEyeTracker) {
         //pupilZmq.receive();
         tobii.get_data();
@@ -214,35 +217,42 @@ void ofApp::update() {
     filter.setQ(filterQ);
     
     //paragraphs[0]->getLetterCentroid(x, y);
+    //ofVec2f lastAttract = paragraphs[0]->attractPoint;
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
-    filter.update(ofVec2f( rawx, rawy ).getInterpolated(paragraphs[0]->attractPoint, 0.9) );
+    
+    if(paragraphs[0]->attractPoint.y != yTarget) {
+        
+        if (ofGetElapsedTimeMillis() - lineChangeTime > lineChangeDwellMs) {
+            yTarget = paragraphs[0]->attractPoint.y;
+        }
+        
+    } else {
+        lineChangeTime = ofGetElapsedTimeMillis();
+    }
+    
+    
+    filter.update(ofVec2f( rawx, yTarget )/*.getInterpolated(paragraphs[0]->attractPoint, 0.9)*/ );
+    // TODO: if attact point y is a new line wait for dwell time to go there
     
     x = filter.value().x;
     y = filter.value().y;
     
     //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
-
     paragraphs[0]->calculateScrollingLine(x, y);
-    
     
 }
 
 void ofApp::draw()
 {
-    
-    
-    //std::cout << "draw" << std::endl;
-
-    // draw the paragraphs //
+    // std::cout << "draw" << std::endl;
+    // draw the paragraphs
     // how to get word and letter at fixation point?
-    
-    //variable:  enlarge 7 to 15 characters in front of fixation point
+    // variable:  enlarge 7 to 15 characters in front of fixation point
     // decrease magnification of text before
     // gradual speed
     // keep enlarged
     
     // text in box or gradual white out line above and under
-    
     float cx = ofGetWidth() / 2.0;
     float cy = ofGetHeight() / 2.0;
     

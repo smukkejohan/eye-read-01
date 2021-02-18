@@ -126,7 +126,7 @@ class Paragraph{
     private:
         
         int magnifyScale;
-    int DPI_SCALE_FACTOR = 20;
+        int DPI_SCALE_FACTOR = 2;
     
         int mWidth;
         int mHeight;

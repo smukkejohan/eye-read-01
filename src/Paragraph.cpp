@@ -170,11 +170,10 @@ void Paragraph::setAlignment(Alignment align)
 
 void Paragraph::setFont(std::string file, int size)
 {
-    //mFont = ofxSmartFont::add(file, size, name);
-    // increase dpi to get smooth shapes ?
     
     ofTrueTypeFontSettings settings(file, size);
     settings.addRange(ofUnicode::Latin);
+    settings.addRange(ofUnicode::Latin1Supplement);
     settings.antialiased = true;
     settings.contours = true;
     settings.simplifyAmt = 0.01f;
@@ -184,17 +183,13 @@ void Paragraph::setFont(std::string file, int size)
     
     ofTrueTypeFontSettings bigSettings(file, size*magnifyScale);
     bigSettings.addRange(ofUnicode::Latin);
+    bigSettings.addRange(ofUnicode::Latin1Supplement);
     bigSettings.antialiased = true;
     bigSettings.contours = true;
     bigSettings.simplifyAmt = 0.01f;
     bigSettings.dpi = 96*DPI_SCALE_FACTOR;
     
     ttfBig.load(bigSettings);
-    
-    //ttf.load(file, size, true, true, true, 0.1f, 96);
-    //ttfBig.load(file, size*magnifyScale, true, true, true, 0.01f, 96*DPI_SCALE_FACTOR); // poor anti aliasing of scaled down ig text ??
-    
-    // Set spacing when scaling up
     render();
 }
 
@@ -369,6 +364,10 @@ void Paragraph::calculateAttractPoint(float x, float y) {
            
         if(lineRect.inside(focusPos)) {
             // save the current line
+            
+            // TODO: slow down going to next line by a line dwell value
+            //
+            
             attractPoint.y = this->y + line.front()->rect.y - mWordBoundaryPadding; //- (mLineHeight + mWordBoundaryPadding)*0.5;
             
             // get closest word / letter in line - use centroid.x to attract x position
