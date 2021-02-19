@@ -121,12 +121,13 @@ class Paragraph{
         float pushOut;
         
     };*/ // TODO: optimization
-        
-    
+        ofTrueTypeFont ttfBig;
+
+        int DPI_SCALE_FACTOR = 2;
+
     private:
         
         int magnifyScale;
-        int DPI_SCALE_FACTOR = 2;
     
         int mWidth;
         int mHeight;
@@ -139,7 +140,6 @@ class Paragraph{
         Alignment mAlignment;
     
         ofTrueTypeFont ttf;
-        ofTrueTypeFont ttfBig;
 
         bool bDrawBorder;
         ofColor mBorderColor;

@@ -231,7 +231,6 @@ class ofApp : public ofBaseApp{
     ofParameter<double> filterQ;
     ofParameter<int> lineChangeDwellMs;
     ofxPanel gui;
-    
     ofParameter<bool> recordData;
 };
 

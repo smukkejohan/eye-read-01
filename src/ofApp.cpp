@@ -195,11 +195,11 @@ void ofApp::setup()
 
 
 void ofApp::update() {
-    
-    //std::cout<<TobiiX<<":"<<TobiiY<<std::endl;
-    
+        
     if(bUseEyeTracker) {
+        //std::cout<<TobiiX<<":"<<TobiiY<<std::endl;
         //pupilZmq.receive();
+        
         tobii.get_data();
         if(isnan(TobiiX) || isnan(TobiiY)) {
             // No update, person is probably blinking
@@ -208,9 +208,7 @@ void ofApp::update() {
             rawy = TobiiY * ofGetHeight();
         }
         
-        
     } else {
-        
         rawx = mouseX;
         rawy = mouseY;
     }
@@ -220,12 +218,18 @@ void ofApp::update() {
     
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     
-    if(paragraphs[0]->attractPoint.y != yTarget) {
+    // TODO: don't move one line up
+    // OR push previous lines up so all text is visible
+    
+    if(paragraphs[0]->attractPoint.y > yTarget || yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)) { // TODO get the exact velue of the previous baseline y height 
+        
         if (ofGetElapsedTimeMillis() - lineChangeTime > lineChangeDwellMs) {
             yTarget = paragraphs[0]->attractPoint.y;
         }
+        
     } else {
         lineChangeTime = ofGetElapsedTimeMillis();
+        
     }
     filter.update(ofVec2f( rawx, yTarget ));
     
@@ -234,6 +238,13 @@ void ofApp::update() {
     
     //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
     paragraphs[0]->calculateScrollingLine(x, y);
+    
+    // sampling rate setting
+    // log to text file
+    // log button
+    // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
+    //
+    
     
 }
 

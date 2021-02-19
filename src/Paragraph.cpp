@@ -27,7 +27,6 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
 
 void Paragraph::draw()
 {
-
     ofPushStyle();
         for (int i=0; i<mWords.size(); i++) {
             ofSetColor(mColor);
