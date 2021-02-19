@@ -44,7 +44,6 @@ public:
     
     static void gaze_data_callback(TobiiResearchGazeData* gaze_data, void* user_data) {
         //memcpy(user_data, gaze_data, sizeof(*gaze_data));
-        
         //printf("Last received gaze package:\n");
         //printf("System time stamp: %"  PRId64 "\n", gaze_data->system_time_stamp);
         //printf("Device time stamp: %"  PRId64 "\n", gaze_data->device_time_stamp);
@@ -54,9 +53,6 @@ public:
         
         TobiiX = gaze_data->left_eye.gaze_point.position_on_display_area.x;
         TobiiY = gaze_data->left_eye.gaze_point.position_on_display_area.y;
-        
-        
-        
     }
     
     void connect() {
@@ -190,12 +186,9 @@ class ofApp : public ofBaseApp{
     
     ofShader shader;
     ofPlanePrimitive plane;
-        
     ofFbo fbo1;
     ofTexture tex1;
-    
     PupilZmq pupilZmq;
-    
     TobiiManager tobii;
     
     /*
@@ -214,14 +207,11 @@ class ofApp : public ofBaseApp{
     //float BOTTOM_RIGHT_Y = 0.4051380090533916;
     
     unsigned int long lineChangeTime = 0;
-
     //bool targetNewLine = true;
     
     float yTarget = 0;
-    
     float rawx;
     float rawy;
-    
     float x;
     float y;
     
@@ -231,24 +221,18 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> bUseEyeTracker;
     //ofxButton ringButton;
     //ofParameter<string> screenSize;
-    
     ofParameter<bool> pushText;
     ofParameter<bool> magnifyWholeWords;
-    
     ofParameter<int> numLettersLeft;
     ofParameter<int> numLettersRight;
-    
     ofParameter<float> magnifyScale;
-    
-    
     //ofParameter<float> magnifyDist;
-    
     ofParameter<double> filterFc;
     ofParameter<double> filterQ;
-    
     ofParameter<int> lineChangeDwellMs;
-
     ofxPanel gui;
+    
+    ofParameter<bool> recordData;
 };
 
 

@@ -42,7 +42,6 @@ void PupilZmq::connect(string addr="127.0.0.1") {
 void PupilZmq::receive() {
         
     //ZMQ_SNDMORE ??
-    
     // how to make sure we empty the buffer ?
     zmq::message_t frame1;
     zmq::message_t frame2;
@@ -96,7 +95,7 @@ void ofApp::setup()
 {
     ofEnableAntiAliasing();
     ofEnableSmoothing();
-    ofSetFrameRate(240);
+    ofSetFrameRate(60);
     
     gui.setup();
     gui.add(bUseEyeTracker.set("use eye tracker", true));
@@ -135,7 +134,6 @@ void ofApp::setup()
     
     ofEnableAlphaBlending();
     
-    
     //ofDisableArbTex();
     //ofSetOrientation(OF_ORIENTATION_DEFAULT, false);
     
@@ -150,7 +148,6 @@ void ofApp::setup()
     int planeRows = planeHeight / planeGridSize;
     
     plane.set(planeWidth, planeHeight, planeColums, planeRows, OF_PRIMITIVE_TRIANGLES);
-    
     plane.mapTexCoordsFromTexture(fbo1.getTexture());*/
     
     ofBackground(ofColor::white);
@@ -199,13 +196,18 @@ void ofApp::setup()
 
 void ofApp::update() {
     
+    //std::cout<<TobiiX<<":"<<TobiiY<<std::endl;
     
     if(bUseEyeTracker) {
         //pupilZmq.receive();
         tobii.get_data();
+        if(isnan(TobiiX) || isnan(TobiiY)) {
+            // No update, person is probably blinking
+        } else {
+            rawx = TobiiX * ofGetWidth();
+            rawy = TobiiY * ofGetHeight();
+        }
         
-        rawx = TobiiX * ofGetWidth();
-        rawy = TobiiY * ofGetHeight();
         
     } else {
         
@@ -216,23 +218,16 @@ void ofApp::update() {
     filter.setFc(filterFc);
     filter.setQ(filterQ);
     
-    //paragraphs[0]->getLetterCentroid(x, y);
-    //ofVec2f lastAttract = paragraphs[0]->attractPoint;
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     
     if(paragraphs[0]->attractPoint.y != yTarget) {
-        
         if (ofGetElapsedTimeMillis() - lineChangeTime > lineChangeDwellMs) {
             yTarget = paragraphs[0]->attractPoint.y;
         }
-        
     } else {
         lineChangeTime = ofGetElapsedTimeMillis();
     }
-    
-    
-    filter.update(ofVec2f( rawx, yTarget )/*.getInterpolated(paragraphs[0]->attractPoint, 0.9)*/ );
-    // TODO: if attact point y is a new line wait for dwell time to go there
+    filter.update(ofVec2f( rawx, yTarget ));
     
     x = filter.value().x;
     y = filter.value().y;
