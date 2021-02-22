@@ -190,6 +190,13 @@ void ofApp::setup()
         paragraphs[i]->setPosition(x+((pWidth+pPadding)*i), ofGetHeight()/2 - paragraphs[0]->getHeight()/2);
     }
     
+    file.open(ofToDataPath("data-export-"+ofGetTimestampString()+".txt"), ofFile::ReadWrite);
+    file.create();
+    
+    stringstream data;
+    data<<"timestamp;rawx;rawy;filteredx;filteredy;currentLineNumber"<<std::endl;
+    file.writeFromBuffer(ofBuffer(data));
+    
     std::cout << "end setup" << std::endl;
 }
 
@@ -221,7 +228,7 @@ void ofApp::update() {
     // TODO: don't move one line up
     // OR push previous lines up so all text is visible
     
-    if(paragraphs[0]->attractPoint.y > yTarget || yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)) { // TODO get the exact velue of the previous baseline y height 
+    if(paragraphs[0]->attractPoint.y > yTarget || yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)) { // TODO get the exact velue of the previous baseline y height
         
         if (ofGetElapsedTimeMillis() - lineChangeTime > lineChangeDwellMs) {
             yTarget = paragraphs[0]->attractPoint.y;
@@ -242,10 +249,14 @@ void ofApp::update() {
     // sampling rate setting
     // log to text file
     // log button
+    // semi colon and linebreak seperated in a txt file
+    // name file with timestamp 
     // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
-    //
+    // TODO: only go back one line when you look two lines above
     
-    
+    stringstream data;
+    data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
+    file.writeFromBuffer(ofBuffer(data));
 }
 
 void ofApp::draw()

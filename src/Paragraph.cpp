@@ -486,12 +486,17 @@ void Paragraph::calculateScrollingLine(float x, float y) {
     
     ofVec2f focusPos(x - this->x, y - this->y);
     
+    int ln = 0;
     for(auto &line : mLines) {
+        ln++;
+        
         ofRectangle lineRect(0, line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
                              mWidth, mLineHeight + (mWordBoundaryPadding * 2));
            
         if(lineRect.inside(focusPos)) {
             currentLine = line;
+            currentLineNumber = ln;
+            
         }
     }
     

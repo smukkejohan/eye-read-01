@@ -120,10 +120,13 @@ class Paragraph{
         float _yDist;
         float pushOut;
         
-    };*/ // TODO: optimization
+    };*/// TODO: optimization
         ofTrueTypeFont ttfBig;
 
         int DPI_SCALE_FACTOR = 2;
+    
+        int currentLineNumber = -1;
+
 
     private:
         
@@ -154,6 +157,8 @@ class Paragraph{
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
+
+    
         word* currentWord;
     
         // animation variables

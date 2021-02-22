@@ -191,6 +191,10 @@ class ofApp : public ofBaseApp{
     PupilZmq pupilZmq;
     TobiiManager tobii;
     
+    //file logging
+    ofFile file;
+
+    
     /*
     lower left 0.38111690686729993,0.4214027202406092
     lower right 0.685358948107331,0.4051380090533916
