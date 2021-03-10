@@ -179,9 +179,8 @@ class ofApp : public ofBaseApp{
         //paragraphs[0]->setFont("Helvetica", pFontSize, value);
     }
     
-        vector<Paragraph*> paragraphs;
-    
-    
+    vector<Paragraph*> paragraphs;
+
     ofxBiquadFilter2f filter;
     
     ofShader shader;
@@ -193,8 +192,6 @@ class ofApp : public ofBaseApp{
     
     //file logging
     ofFile file;
-
-    
     /*
     lower left 0.38111690686729993,0.4214027202406092
     lower right 0.685358948107331,0.4051380090533916
@@ -210,9 +207,10 @@ class ofApp : public ofBaseApp{
     //float BOTTOM_RIGHT_X = 0.685358948107331;
     //float BOTTOM_RIGHT_Y = 0.4051380090533916;
     
-    unsigned int long lineChangeTime = 0;
+    unsigned int long lineChangeTimeNext = 0;
+    unsigned int long lineChangeTimePrevious = 0;
+
     //bool targetNewLine = true;
-    
     float yTarget = 0;
     float rawx;
     float rawy;
@@ -233,14 +231,15 @@ class ofApp : public ofBaseApp{
     //ofParameter<float> magnifyDist;
     ofParameter<double> filterFc;
     ofParameter<double> filterQ;
-    ofParameter<int> lineChangeDwellMs;
+    ofParameter<int> lineChangeNextDwellMs;
+    ofParameter<int> lineChangePreviousDwellMs;
+
     ofxPanel gui;
     ofParameter<bool> recordData;
+    ofParameter<bool> showCursor;
+    ofParameter<bool> showAttractPoint;
+
 };
-
-
-
-
 
 
 /* example msgpack data

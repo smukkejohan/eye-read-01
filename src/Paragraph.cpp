@@ -346,11 +346,9 @@ bool sortWordsByDistance(Paragraph::word & a, Paragraph::word & b){
 }
 
 
-
-// dwell  calculation ... ish
 void Paragraph::calculateAttractPoint(float x, float y) {
     
-    ofVec2f focusPos(x - this->x, y - this->y);
+    ofVec2f pos(x - this->x, y - this->y);
     
     // get closest line // NOT necesarily in it TODO
     // use line to attract Y position
@@ -361,7 +359,7 @@ void Paragraph::calculateAttractPoint(float x, float y) {
         mWidth, mLineHeight + (mWordBoundaryPadding * 2));
         // set rect of last to end at bottom and rect of first to end at top
            
-        if(lineRect.inside(focusPos)) {
+        if(lineRect.inside(pos)) {
             // save the current line
             
             // TODO: slow down going to next line by a line dwell value
@@ -374,9 +372,9 @@ void Paragraph::calculateAttractPoint(float x, float y) {
             for (std::size_t i = 0, e = line.size(); i != e; ++i) {
                 auto &w = line.at(i);
                 // Get the closest word
-                if( focusPos.x < w->rect.getX() + w->rect.width ) {
+                if( pos.x < w->rect.getX() + w->rect.width ) {
                     // attractPoint.x = this->x + w->rect.getX() + w->rect.width*0.5; // snap to center of word
-                    attractPoint.x = focusPos.x + this->x;
+                    attractPoint.x = pos.x + this->x;
                    break;
                 }
             }
@@ -388,11 +386,19 @@ void Paragraph::calculateAttractPoint(float x, float y) {
 
 void Paragraph::calculateAttractPointScrolling(float x, float y) {
     
-    ofVec2f focusPos(x - this->x, y - this->y);
+    if(freezeLastWord ) {
+        ofVec2f p = nextLine.front()->rect.position;
+        attractPoint = ofVec2f(this->x + p.x, this->y + p.y);
+        return;
+    }
+
+    
+    ofVec2f pos(x - this->x, y - this->y);
     
     // get closest line // NOT necesarily in it TODO
     // use line to attract Y position
     attractPoint.x = focusPos.x + this->x;
+    
 
     for(auto &line : mLines) {
         
@@ -401,7 +407,7 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
         mWidth, mLineHeight + (mWordBoundaryPadding * 2));
         // set rect of last to end at bottom and rect of first to end at top
            
-        if(lineRect.inside(focusPos)) {
+        if(lineRect.inside(pos)) {
             // save the current line
             attractPoint.y = this->y + line.front()->rect.y - mWordBoundaryPadding; //- (mLineHeight + mWordBoundaryPadding)*0.5;
             
@@ -413,94 +419,256 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
 
 
 void Paragraph::drawScrollingLine() {
+    const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
+    
+
+
     ofPushMatrix();
     ofTranslate(this->x, this->y);
     ofPushStyle();
     // Draw other lines
     for(auto &line : mLines) {
-        if(line != currentLine) {
+        if(line != currentLine && line != nextLine) {
             ofSetColor(80,80,80);
             for(auto &w : line) {
                 ttf.drawString(w->text, w->rect.x, w->rect.y);
             }
         }
     }
-
+    
+    
     if(currentLine.size() > 0) {
         // Draw current line magnified - using eye movement to scroll
-        const double scale =  (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
         
-            int xIn = 0;
             std::string maglinetxt = "";
-        
-            for(auto &w : currentLine) {
-                maglinetxt += w->text;
-                if(w != currentLine.back()) {
-                    maglinetxt += " ";
-                }
-            }
-        
-            ofPushMatrix();
-            ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
-            ofScale(scale, scale);
+            
+            if(isLastWord) {
+                
+                /*for(auto &w : currentLine) {
+                    if(w != currentWord) {
+                        ttf.drawString(w->text, w->rect.x, w->rect.y);
+                    }
+                }*/
+                std::string linetxt = "";
 
-            //ofScale(0.025,0.025);
+                for(int i=0; i < currentLine.size()-1; i++ ) {
+                    auto &w = currentLine.at(i);
+                    linetxt += w->text;
+                    
+                    linetxt += " ";
+                }
+
                 
-            // draw background
-            ofSetColor(255,255,255);
-            ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
-            ofDrawRectangle(bounding);
+                maglinetxt += currentLine.back()->text;
                 
-            ofSetColor(0,0,0);
-        //ofMap(attractPoint.x, 0, 100, 0, bounding.width / scale) TODO calculate percentage in word
-            ttfBig.drawStringAsShapes(maglinetxt, ofMap(scrollIn, 0, 1, 0, -(bounding.width-(mWidth/scale))) ,  0);
-        
+                ofPushMatrix();
+                ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
+                ofScale(scale, scale);
+                    
+                // draw background
+                ofSetColor(255,255,255);
+                ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
                 
-            ofPopMatrix();
-        
+                bounding.setX((currentLineWidth/scale) - bounding.width);
+                ofDrawRectangle(bounding);
+            
+                ofSetColor(0,0,0);
+                ttfBig.drawStringAsShapes(maglinetxt, (currentLineWidth/scale) - bounding.width,  0);
+                
+                ofPopMatrix();
+                
+                ofRectangle prl = ttf.getStringBoundingBox(linetxt, 0, 0);
+
+                float wD = currentLineWidth - prl.width;
+                
+                ttf.drawString(linetxt, currentLine.front()->rect.x - (bounding.width*scale - wD), currentLine.front()->rect.y);
+                
+                
+            } else {
+                
+                for(auto &w : currentLine) {
+                    maglinetxt += w->text;
+                    if(w != currentLine.back()) {
+                        maglinetxt += " ";
+                    }
+                }
+                
+                ofPushMatrix();
+                ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
+                ofScale(scale, scale);
+                    
+                // draw background
+                ofSetColor(255,255,255);
+                ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
+                ofDrawRectangle(bounding);
+            
+                ofSetColor(0,0,0);
+                ttfBig.drawStringAsShapes(maglinetxt, (focusPos.x/scale) + (-scrollIn * bounding.width),  0);
+                
+                ofPopMatrix();
+                
+                
+                
+            }
         
         // Mask off magnified outside of paragraph
         ofSetColor(255,255,255);
         ofDrawRectangle(-this->x, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
         ofDrawRectangle(mWidth, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
 
-
+        
     }
     
+    if(isLastWord) {
+        
+        if(nextLine.size() > 0) {
+            
+            std::string linetxt = " ";
+
+            for(int i=1; i < nextLine.size(); i++ ) {
+                auto &w = nextLine.at(i);
+                linetxt += w->text;
+                
+                linetxt += " ";
+            }
+            
+            // Draw next line magnified
+            
+                std::string maglinetxt = "";
+            
+                maglinetxt += nextLine.front()->text;
+    
+                ofPushMatrix();
+                ofTranslate(nextLine.front()->rect.x, nextLine.front()->rect.y);
+                ofScale(scale, scale);
+
+                //ofScale(0.025,0.025);
+                    
+                // draw background
+                ofSetColor(255,255,255);
+                ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
+            ofDrawRectangle(0, bounding.y, bounding.width+4, bounding.height+2 );
+                    
+                ofSetColor(0,0,0);
+                ttfBig.drawStringAsShapes(maglinetxt, 0, 0);
+            
+                ofPopMatrix();
+            
+            ofRectangle prl = ttf.getStringBoundingBox(linetxt, 0, 0);
+
+            float wD = currentLineWidth - prl.width;
+            
+            ttf.drawString(linetxt, bounding.width*scale, nextLine.front()->rect.y);
+            
+            // Mask off magnified outside of paragraph
+            ofSetColor(255,255,255);
+            ofDrawRectangle(-this->x, nextLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
+            ofDrawRectangle(mWidth, nextLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
+            
+        }
+        
+    } else if(nextLine.size() > 0) {
+        
+        for(auto &w : nextLine) {
+            ofSetColor(0,0,0);
+            ttf.drawString(w->text, w->rect.x, w->rect.y);
+        }
+        
+    }
     
     ofPopStyle();
     ofPopMatrix();
     
-    
-     
     // ofDrawCircle(draw_magnifyBounding.width/2 , linePos, 20);
-     
-     
-     
-     
-    
 
 }
 
 void Paragraph::calculateScrollingLine(float x, float y) {
     
-    ofVec2f focusPos(x - this->x, y - this->y);
+    isLastWord = false;
+    
+    if(freezeLastWord) {
+        ofVec2f nP = ofVec2f(x - this->x, y - this->y);
+        const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
+        
+        ofRectangle bounding = ttfBig.getStringBoundingBox(nextLine.front()->text, 0, 0);
+        
+        if( ofVec2f(nextLine.front()->rect.position).distance(nP) < bounding.width*scale ) {
+            
+            freezeLastWord = false;
+            focusPos = ofVec2f(x - this->x, y - this->y);
+        }
+    } else {
+        focusPos = ofVec2f(x - this->x, y - this->y);
+    }
+    
     
     int ln = 0;
+    currentLineWidth = 0;
+    
     for(auto &line : mLines) {
         ln++;
         
         ofRectangle lineRect(0, line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
-                             mWidth, mLineHeight + (mWordBoundaryPadding * 2));
+                             mWidth+200, mLineHeight + (mWordBoundaryPadding * 2));
            
-        if(lineRect.inside(focusPos)) {
+        if( lineRect.inside(focusPos) ) {
             currentLine = line;
+            if( mLines.size() > ln ) {
+                nextLine = mLines.at(ln);
+            } else {
+                nextLine.clear();
+            }
             currentLineNumber = ln;
+            
+            for (std::size_t i = 0, eL = currentLine.size(); i != eL; ++i) {
+                auto &w = currentLine.at(i);
+                   
+                ofRectangle r(w->rect.x - (mWordBoundaryPadding + spaceWidthPx),
+                       w->rect.y - mLineHeight*2.25 - mWordBoundaryPadding,
+                       w->rect.width + (mWordBoundaryPadding + spaceWidthPx)*2,
+                       mLineHeight*4 + (mWordBoundaryPadding * 2));
+                
+                currentLineWidth += r.width;
+                
+                
+                if( r.inside(focusPos) ) {
+                    currentWord = w;
+                }
+                
+                if(i == currentLine.size() -1 ) {
+                    if(focusPos.x > r.getMinX()) {
+                        if(nextLine.size() > 0) {
+                            isLastWord = true;
+                        }
+                    }
+                }
+
+                
+            }
+            
             
         }
     }
     
-    scrollIn = ofMap(focusPos.x, 0, mWidth, 0, 1);
+    if(isLastWord && !freezeLastWord) {
+        freezeLastWordTime = ofGetElapsedTimeMillis();
+        freezeLastWord = true;
+        
+    } else {
+        
+        
+        
+    }
+    
+    if ( ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
+        freezeLastWord = false;
+    }
+
+    
+    
+    focusPos.x = ofClamp(focusPos.x, 0, currentLineWidth);
+    scrollIn = ofMap(focusPos.x, 0, currentLineWidth, 0, 1);
     
 }
 
@@ -508,7 +676,7 @@ void Paragraph::calculateScrollingLine(float x, float y) {
 
 void Paragraph::calculateMagnifiedLetters(float x, float y, int numLettersLeft, int numLettersRight, bool push, bool magnifyWholeWords) {
         
-    ofVec2f focusPos(x - this->x, y - this->y);
+    focusPos = ofVec2f(x - this->x, y - this->y);
     
     for(auto &line : mLines) {
         ofRectangle lineRect(0,
@@ -802,7 +970,7 @@ void Paragraph::drawMagnified1(float x, float y, float scale) { // Scale is 1 to
     
     float maxDist = 400;
     float bigWordPadding = mWordBoundaryPadding * magnifyScale;
-    ofVec2f focusPos(x - this->x, y - this->y);
+    //ofVec2f focusPos(x - this->x, y - this->y);
     
     for(auto &w : mWords) {
         ofRectangle r(w.rect.x - mWordBoundaryPadding,

@@ -116,8 +116,13 @@ void ofApp::setup()
     
     gui.add(filterQ.set("filterQ", 0.707));
     
-    gui.add(lineChangeDwellMs.set("Vertival dwell millis", 600, 0, 3000));
+    gui.add(lineChangePreviousDwellMs.set("dwell previous", 1200, 0, 6000));
+    gui.add(lineChangeNextDwellMs.set("dwell next", 600, 0, 3000));
     
+    gui.add(showCursor.set("draw ", true));
+
+    gui.add(showAttractPoint.set("attract point", true));
+
 
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
@@ -223,21 +228,36 @@ void ofApp::update() {
     filter.setFc(filterFc);
     filter.setQ(filterQ);
     
+    rawx = ofClamp(rawx, paragraphs[0]->x, paragraphs[0]->x+paragraphs[0]->getWidth());
+    rawy = ofClamp(rawy, paragraphs[0]->y, paragraphs[0]->y+paragraphs[0]->getHeight());
+    
+    
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     
-    // TODO: don't move one line up
-    // OR push previous lines up so all text is visible
+    // TODO: handle one line up better
     
-    if(paragraphs[0]->attractPoint.y > yTarget || yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)) { // TODO get the exact velue of the previous baseline y height
+    if(paragraphs[0]->attractPoint.y > yTarget) {
+        if (ofGetElapsedTimeMillis() - lineChangeTimeNext > lineChangeNextDwellMs) {
+            yTarget = paragraphs[0]->attractPoint.y;
+            
+            // TODO: maybe force to start of line when changing to next
+            // filter.clear(ofVec2f(paragraphs[0]->x, yTarget));
+        }
         
-        if (ofGetElapsedTimeMillis() - lineChangeTime > lineChangeDwellMs) {
+    } else {
+        lineChangeTimeNext = ofGetElapsedTimeMillis();
+    }
+    
+    if(paragraphs[0]->attractPoint.y < yTarget /*|| yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)*/) {
+                
+        if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs) {
             yTarget = paragraphs[0]->attractPoint.y;
         }
         
     } else {
-        lineChangeTime = ofGetElapsedTimeMillis();
-        
+        lineChangeTimePrevious = ofGetElapsedTimeMillis();
     }
+    
     filter.update(ofVec2f( rawx, yTarget ));
     
     x = filter.value().x;
@@ -246,13 +266,10 @@ void ofApp::update() {
     //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
     paragraphs[0]->calculateScrollingLine(x, y);
     
-    // sampling rate setting
-    // log to text file
-    // log button
+    // TODO: sampling rate setting
     // semi colon and linebreak seperated in a txt file
     // name file with timestamp 
     // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
-    // TODO: only go back one line when you look two lines above
     
     stringstream data;
     data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
@@ -270,8 +287,8 @@ void ofApp::draw()
     // keep enlarged
     
     // text in box or gradual white out line above and under
-    float cx = ofGetWidth() / 2.0;
-    float cy = ofGetHeight() / 2.0;
+    //float cx = ofGetWidth() / 2.0;
+    //float cy = ofGetHeight() / 2.0;
     
     // the plane is being position in the middle of the screen,
     // so we have to apply the same offset to the mouse coordinates before passing into the shader.
@@ -335,19 +352,25 @@ void ofApp::draw()
     //fbo1.draw(0, 0);
     //shader.end();
     
-    ofSetColor(0);
-    ofDrawCircle(x, y, 10);
+    if(showCursor) {
+        ofSetColor(0);
+        ofDrawCircle(x, y, 10);
+    }
             
-    ofSetColor(255,0,0);
-    ofDrawCircle(paragraphs[0]->attractPoint, 8);
-    
+    if(showAttractPoint) {
+        ofSetColor(255,0,0);
+        ofDrawCircle(paragraphs[0]->attractPoint, 8);
+    }
     
     ofSetColor(0);
-
     ofDrawBitmapString(ofGetFrameRate(), ofGetWidth()-80, ofGetHeight()-40);
     
     ofSetColor(255);
     gui.draw();
+    
+    ofSetColor(0);
+
+    /*ofDrawRectangle(paragraphs[0]->x, paragraphs[0]->y, paragraphs[0]->getWidth(), paragraphs[0]->getHeight());*/
     
     
     

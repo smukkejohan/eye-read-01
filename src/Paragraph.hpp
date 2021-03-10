@@ -101,7 +101,8 @@ class Paragraph{
     
         // void drawSegments
         ofVec2f attractPoint;
-        
+        ofVec2f focusPos;
+    
         void getLetterCentroid(float x, float y);
         void drawNearestWord(float x, float y);
 
@@ -126,7 +127,13 @@ class Paragraph{
         int DPI_SCALE_FACTOR = 2;
     
         int currentLineNumber = -1;
+        
+        bool isLastWord = false;
+        bool freezeLastWord = false;
+        int freezeLastWordDwellTime = 20000;
+        unsigned int long freezeLastWordTime = 0;
 
+        
 
     private:
         
@@ -157,7 +164,10 @@ class Paragraph{
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
+    
+        std::vector< word*> nextLine;
 
+    float currentLineWidth;
     
         word* currentWord;
     
