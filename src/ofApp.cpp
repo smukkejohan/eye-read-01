@@ -161,8 +161,11 @@ void ofApp::setup()
     
     ofBackground(ofColor::white);
     ofSetFullscreen(true);
-
-    Paragraph* p = new Paragraph(text1);
+    
+    
+    ofBuffer textBuffer = ofBufferFromFile(ofToDataPath("text.txt"), false);
+    
+    Paragraph* p = new Paragraph(textBuffer.getText());
     
         p->setColor(ofColor::fromHex(0x555555));
         //p->drawBorder(ofColor::fromHex(0x777777));
