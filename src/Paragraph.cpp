@@ -397,7 +397,7 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
     
     // get closest line // NOT necesarily in it TODO
     // use line to attract Y position
-    attractPoint.x = focusPos.x + this->x;
+    attractPoint.x = pos.x + this->x;
     
 
     for(auto &line : mLines) {
@@ -420,8 +420,6 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
 
 void Paragraph::drawScrollingLine() {
     const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
-    
-
 
     ofPushMatrix();
     ofTranslate(this->x, this->y);
@@ -450,40 +448,47 @@ void Paragraph::drawScrollingLine() {
                     }
                 }*/
                 std::string linetxt = "";
+                
 
                 for(int i=0; i < currentLine.size()-1; i++ ) {
                     auto &w = currentLine.at(i);
                     linetxt += w->text;
-                    
                     linetxt += " ";
                 }
+                
 
-                
                 maglinetxt += currentLine.back()->text;
-                
+                    
                 ofPushMatrix();
                 ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
                 ofScale(scale, scale);
-                    
+                        
                 // draw background
-                ofSetColor(255,255,255);
                 ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
-                
-                bounding.setX((currentLineWidth/scale) - bounding.width);
-                ofDrawRectangle(bounding);
-            
-                ofSetColor(0,0,0);
-                ttfBig.drawStringAsShapes(maglinetxt, (currentLineWidth/scale) - bounding.width,  0);
-                
+                    
+                int rJ = (mWidth/scale) - bounding.width;
+                bounding.setX(rJ);
+                    
+                if(ofGetElapsedTimeMillis() - freezeLastWordTime < freezeLastWordDwellTime) {
+                    
+                    ofSetColor(255,255,255);
+                    ofDrawRectangle(bounding);
+                    ofSetColor(0,0,0);
+                    ttfBig.drawStringAsShapes(maglinetxt, rJ,  0);
+                }
+                    
                 ofPopMatrix();
-                
+                    
                 ofRectangle prl = ttf.getStringBoundingBox(linetxt, 0, 0);
-
-                float wD = currentLineWidth - prl.width;
+                float wD = mWidth - prl.width;
+                    
+                if(ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
+                    linetxt += currentLine.back()->text;
+                }
                 
+                ofSetColor(0,0,0);
                 ttf.drawString(linetxt, currentLine.front()->rect.x - (bounding.width*scale - wD), currentLine.front()->rect.y);
-                
-                
+
             } else {
                 
                 for(auto &w : currentLine) {
@@ -507,8 +512,6 @@ void Paragraph::drawScrollingLine() {
                 
                 ofPopMatrix();
                 
-                
-                
             }
         
         // Mask off magnified outside of paragraph
@@ -519,7 +522,10 @@ void Paragraph::drawScrollingLine() {
         
     }
     
-    if(isLastWord) {
+    
+
+        
+    if(isLastWord && ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
         
         if(nextLine.size() > 0) {
             
@@ -583,25 +589,32 @@ void Paragraph::drawScrollingLine() {
 
 }
 
-void Paragraph::calculateScrollingLine(float x, float y) {
+void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy) {
     
     isLastWord = false;
     
     if(freezeLastWord) {
-        ofVec2f nP = ofVec2f(x - this->x, y - this->y);
+        ofVec2f nP = ofVec2f(rawx - this->x, rawy - this->y);
         const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
         
-        ofRectangle bounding = ttfBig.getStringBoundingBox(nextLine.front()->text, 0, 0);
+        ofRectangle bounding = ttf.getStringBoundingBox(nextLine.front()->text, 0, 0);
         
-        if( ofVec2f(nextLine.front()->rect.position).distance(nP) < bounding.width*scale ) {
+        if(nextLineTargetReached) {
             
-            freezeLastWord = false;
-            focusPos = ofVec2f(x - this->x, y - this->y);
+            if( ofVec2f(nextLine.front()->rect.position).distance(nP) > bounding.width*scale ) {
+                // raget reacged and exited, start new dynamic magnification
+                nextLineTargetReached = false;
+                freezeLastWord = false;
+                focusPos = ofVec2f(x - this->x, y - this->y);
+                
+            }
+            
+        } else if( ofVec2f(nextLine.front()->rect.position).distance(nP) < bounding.width*scale ) {
+            nextLineTargetReached = true;
         }
     } else {
         focusPos = ofVec2f(x - this->x, y - this->y);
     }
-    
     
     int ln = 0;
     currentLineWidth = 0;
@@ -661,7 +674,7 @@ void Paragraph::calculateScrollingLine(float x, float y) {
         
     }
     
-    if ( ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
+    if ( ofGetElapsedTimeMillis() - freezeLastWordTime > lineTransitionDwellTime) {
         freezeLastWord = false;
     }
 

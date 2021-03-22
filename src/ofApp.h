@@ -238,6 +238,9 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> recordData;
     ofParameter<bool> showCursor;
     ofParameter<bool> showAttractPoint;
+    
+    ofParameter<int> freezeLastWordDwellTime;
+    ofParameter<int> lineTransitionDwellTime;
 
 };
 

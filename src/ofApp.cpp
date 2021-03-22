@@ -94,6 +94,7 @@ void PupilZmq::receive() {
 void ofApp::setup()
 {
     ofEnableAntiAliasing();
+    ofEnableAlphaBlending();
     ofEnableSmoothing();
     ofSetFrameRate(60);
     
@@ -118,6 +119,9 @@ void ofApp::setup()
     
     gui.add(lineChangePreviousDwellMs.set("dwell previous", 1200, 0, 6000));
     gui.add(lineChangeNextDwellMs.set("dwell next", 600, 0, 3000));
+
+    gui.add(freezeLastWordDwellTime.set("dwell last word", 2000, 0, 4000));
+    gui.add(lineTransitionDwellTime.set("dwell next locked", 10000, 4000, 20000));
     
     gui.add(showCursor.set("draw ", true));
 
@@ -207,6 +211,9 @@ void ofApp::setup()
 
 
 void ofApp::update() {
+    
+    paragraphs[0]->freezeLastWordDwellTime = freezeLastWordDwellTime.get();
+    paragraphs[0]->lineTransitionDwellTime = lineTransitionDwellTime.get();
         
     if(bUseEyeTracker) {
         //std::cout<<TobiiX<<":"<<TobiiY<<std::endl;
@@ -258,13 +265,13 @@ void ofApp::update() {
         lineChangeTimePrevious = ofGetElapsedTimeMillis();
     }
     
-    filter.update(ofVec2f( rawx, yTarget ));
+    filter.update(ofVec2f( paragraphs[0]->attractPoint.x, yTarget ));
     
     x = filter.value().x;
     y = filter.value().y;
     
     //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
-    paragraphs[0]->calculateScrollingLine(x, y);
+    paragraphs[0]->calculateScrollingLine(x, y, rawx, rawy);
     
     // TODO: sampling rate setting
     // semi colon and linebreak seperated in a txt file
@@ -352,15 +359,22 @@ void ofApp::draw()
     //fbo1.draw(0, 0);
     //shader.end();
     
+    ofPushStyle();
     if(showCursor) {
-        ofSetColor(0);
-        ofDrawCircle(x, y, 10);
+        ofSetColor(255,120,120, 127);
+        ofDrawCircle(x, y, 8);
+        
+        ofSetColor(120,120,255, 127);
+        ofDrawCircle(rawx, rawy, 6);
+
     }
             
     if(showAttractPoint) {
-        ofSetColor(255,0,0);
-        ofDrawCircle(paragraphs[0]->attractPoint, 8);
+        ofSetColor(120,255,120, 127);
+        ofDrawCircle(paragraphs[0]->attractPoint, 4);
     }
+    
+    ofPopStyle();
     
     ofSetColor(0);
     ofDrawBitmapString(ofGetFrameRate(), ofGetWidth()-80, ofGetHeight()-40);

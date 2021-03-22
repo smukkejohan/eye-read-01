@@ -88,7 +88,7 @@ class Paragraph{
         
         //
         void drawScrollingLine();
-        void calculateScrollingLine(float x, float y);
+        void calculateScrollingLine(float x, float y, float rawx, float rawy);
         double scrollIn = 0;
         //
     
@@ -116,12 +116,13 @@ class Paragraph{
     /*struct bigWord {
         std::string text;
         ofRectangle rect;
-        
         float _xDist;
         float _yDist;
         float pushOut;
         
-    };*/// TODO: optimization
+    };*/
+    // TODO: optimization
+    
         ofTrueTypeFont ttfBig;
 
         int DPI_SCALE_FACTOR = 2;
@@ -130,11 +131,15 @@ class Paragraph{
         
         bool isLastWord = false;
         bool freezeLastWord = false;
-        int freezeLastWordDwellTime = 20000;
+        
+        bool nextLineTargetReached = false;
+    
+        int freezeLastWordDwellTime = 2000;
+        int lineTransitionDwellTime = 10000;
+    
         unsigned int long freezeLastWordTime = 0;
 
         
-
     private:
         
         int magnifyScale;
