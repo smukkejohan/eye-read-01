@@ -162,7 +162,6 @@ void ofApp::setup()
     ofBackground(ofColor::white);
     ofSetFullscreen(true);
     
-    
     ofBuffer textBuffer = ofBufferFromFile(ofToDataPath("text.txt"), false);
     
     Paragraph* p = new Paragraph(textBuffer.getText());
@@ -175,7 +174,7 @@ void ofApp::setup()
         paragraphs.push_back(p);
 
 // change these to whatever you want //
-    int pWidth = 600;
+    int pWidth = 1400;
     int pFontSize = 14;
     float pPadding = pWidth*.30;
 
@@ -187,7 +186,7 @@ void ofApp::setup()
     }
     
 // load our fonts and layout our paragraphs //
-    paragraphs[0]->setFont("Helvetica", pFontSize);
+    paragraphs[0]->setFont("Futura", pFontSize);
     //ofxSmartFont::list();
     
     int pLeading = pFontSize*.85; // 0.65
@@ -245,26 +244,28 @@ void ofApp::update() {
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     
     // TODO: handle one line up better
-    
     if(paragraphs[0]->attractPoint.y > yTarget) {
         if (ofGetElapsedTimeMillis() - lineChangeTimeNext > lineChangeNextDwellMs) {
-            yTarget = paragraphs[0]->attractPoint.y;
             
-            // TODO: maybe force to start of line when changing to next
-            // filter.clear(ofVec2f(paragraphs[0]->x, yTarget));
+            // After dwell time continue to next line
+            yTarget = paragraphs[0]->attractPoint.y;
         }
         
     } else {
+        // reset if still in in same line
         lineChangeTimeNext = ofGetElapsedTimeMillis();
     }
     
     if(paragraphs[0]->attractPoint.y < yTarget /*|| yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)*/) {
                 
         if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs) {
+            
+            // After dwell time return to previous line
             yTarget = paragraphs[0]->attractPoint.y;
         }
         
     } else {
+        // reset if still in in same line
         lineChangeTimePrevious = ofGetElapsedTimeMillis();
     }
     

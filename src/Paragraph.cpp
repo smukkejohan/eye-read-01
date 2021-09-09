@@ -388,7 +388,10 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
     
     if(freezeLastWord ) {
         ofVec2f p = nextLine.front()->rect.position;
+        
+        // TODO: don't continue if we have not moved down the page
         attractPoint = ofVec2f(this->x + p.x, this->y + p.y);
+        
         return;
     }
 
@@ -518,11 +521,7 @@ void Paragraph::drawScrollingLine() {
         ofSetColor(255,255,255);
         ofDrawRectangle(-this->x, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
         ofDrawRectangle(mWidth, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
-
-        
     }
-    
-    
 
         
     if(isLastWord && ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
@@ -601,12 +600,11 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
         
         if(nextLineTargetReached) {
             
-            if( ofVec2f(nextLine.front()->rect.position).distance(nP) > bounding.width*scale ) {
-                // raget reacged and exited, start new dynamic magnification
+            if(ofVec2f(nextLine.front()->rect.position).distance(nP) > bounding.width*scale ) {
+                // target reached and exited, start new dynamic magnification
                 nextLineTargetReached = false;
                 freezeLastWord = false;
                 focusPos = ofVec2f(x - this->x, y - this->y);
-                
             }
             
         } else if( ofVec2f(nextLine.front()->rect.position).distance(nP) < bounding.width*scale ) {
@@ -649,27 +647,27 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
                     currentWord = w;
                 }
                 
-                if(i == currentLine.size() -1 ) {
+                if(i == currentLine.size()-1 ) {
                     if(focusPos.x > r.getMinX()) {
                         if(nextLine.size() > 0) {
-                            isLastWord = true;
+                            
+                            // CHECK HERE !!!!
+                            if(lineRect.inside(ofVec2f(rawx - this->x, rawy - this->y))) {
+                                isLastWord = true;
+                            }
                         }
                     }
                 }
-
-                
             }
-            
-            
         }
     }
     
+    // TODO: stay in mag first word of next line if we have nit moved from within last word of previous line
     if(isLastWord && !freezeLastWord) {
         freezeLastWordTime = ofGetElapsedTimeMillis();
         freezeLastWord = true;
         
     } else {
-        
         
         
     }
