@@ -16,6 +16,8 @@
 
 
 #define MSGPACK_DISABLE_LEGACY_NIL
+#define MSGPACK_TYPE_BOOST_MSGPACK_VARIANT_HPP
+
 #include <msgpack.hpp>
 #include <zmq.hpp>
 

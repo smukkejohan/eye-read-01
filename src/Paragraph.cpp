@@ -362,9 +362,6 @@ void Paragraph::calculateAttractPoint(float x, float y) {
         if(lineRect.inside(pos)) {
             // save the current line
             
-            // TODO: slow down going to next line by a line dwell value
-            //
-            
             attractPoint.y = this->y + line.front()->rect.y - mWordBoundaryPadding; //- (mLineHeight + mWordBoundaryPadding)*0.5;
             
             // get closest word / letter in line - use centroid.x to attract x position
@@ -436,7 +433,6 @@ void Paragraph::drawScrollingLine() {
             }
         }
     }
-    
     
     if(currentLine.size() > 0) {
         // Draw current line magnified - using eye movement to scroll
@@ -521,6 +517,7 @@ void Paragraph::drawScrollingLine() {
         ofSetColor(255,255,255);
         ofDrawRectangle(-this->x, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
         ofDrawRectangle(mWidth, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
+        
     }
 
         
@@ -582,19 +579,34 @@ void Paragraph::drawScrollingLine() {
     }
     
     ofPopStyle();
+    
+    //ofDrawCircle(focusPos, 20);
+    
     ofPopMatrix();
     
     // ofDrawCircle(draw_magnifyBounding.width/2 , linePos, 20);
+    
+    ofSetColor(0,0,0);
+    
+    ofDrawBitmapString(currentLineNumber, 40, ofGetHeight() - 80);
+    ofDrawBitmapString(isLastWord, 40, ofGetHeight() - 60);
+    ofDrawBitmapString(ofGetElapsedTimeMillis() - freezeLastWordTime, 40, ofGetHeight() - 40);
+    
+    
+    //ofSetColor(0,0,0, 200);
 
+    
 }
 
 void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy) {
     
+    ofVec2f nP = ofVec2f(rawx - this->x, rawy - this->y);
+    const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
+
     isLastWord = false;
+    bool inLastWord = false;
     
     if(freezeLastWord) {
-        ofVec2f nP = ofVec2f(rawx - this->x, rawy - this->y);
-        const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
         
         ofRectangle bounding = ttf.getStringBoundingBox(nextLine.front()->text, 0, 0);
         
@@ -602,6 +614,7 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
             
             if(ofVec2f(nextLine.front()->rect.position).distance(nP) > bounding.width*scale ) {
                 // target reached and exited, start new dynamic magnification
+                std::cout<<"target reached and exited"<<std::endl;
                 nextLineTargetReached = false;
                 freezeLastWord = false;
                 focusPos = ofVec2f(x - this->x, y - this->y);
@@ -622,15 +635,22 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
         
         ofRectangle lineRect(0, line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
                              mWidth+200, mLineHeight + (mWordBoundaryPadding * 2));
+        
+        
            
         if( lineRect.inside(focusPos) ) {
             currentLine = line;
+            
             if( mLines.size() > ln ) {
                 nextLine = mLines.at(ln);
             } else {
                 nextLine.clear();
             }
             currentLineNumber = ln;
+            
+            
+            inLastWord = lineRect.inside(nP) && nP.x >= line.back()->rect.getMinX();
+            
             
             for (std::size_t i = 0, eL = currentLine.size(); i != eL; ++i) {
                 auto &w = currentLine.at(i);
@@ -642,7 +662,6 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
                 
                 currentLineWidth += r.width;
                 
-                
                 if( r.inside(focusPos) ) {
                     currentWord = w;
                 }
@@ -650,11 +669,7 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
                 if(i == currentLine.size()-1 ) {
                     if(focusPos.x > r.getMinX()) {
                         if(nextLine.size() > 0) {
-                            
-                            // CHECK HERE !!!!
-                            if(lineRect.inside(ofVec2f(rawx - this->x, rawy - this->y))) {
-                                isLastWord = true;
-                            }
+                            isLastWord = true;
                         }
                     }
                 }
@@ -662,25 +677,26 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
         }
     }
     
-    // TODO: stay in mag first word of next line if we have nit moved from within last word of previous line
-    if(isLastWord && !freezeLastWord) {
+
+    if(isLastWord && !freezeLastWord /*&& ofGetElapsedTimeMillis() - freezeLastWordTime > lineTransitionDwellTime*/  ) {
         freezeLastWordTime = ofGetElapsedTimeMillis();
         freezeLastWord = true;
         
     } else {
-        
-        
     }
+    
+    std::cout<<inLastWord<<std::endl;
     
     if ( ofGetElapsedTimeMillis() - freezeLastWordTime > lineTransitionDwellTime) {
-        freezeLastWord = false;
+        
+        if(!inLastWord) {
+            freezeLastWord = false;
+        }
+        
     }
 
-    
-    
     focusPos.x = ofClamp(focusPos.x, 0, currentLineWidth);
     scrollIn = ofMap(focusPos.x, 0, currentLineWidth, 0, 1);
-    
 }
 
 
@@ -762,7 +778,7 @@ void Paragraph::calculateMagnifiedLetters(float x, float y, int numLettersLeft, 
                                letterCount++;
                                
                            } else {
-
+                               
                                // get word before
                                wordIndex--;
                                if(wordIndex < 0) {

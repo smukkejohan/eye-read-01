@@ -1,0 +1,6 @@
+[submodule "lib/azmq"]
+	path = lib/azmq
+[submodule "lib/cppzmq"]
+	path = lib/cppzmq
+[submodule "lib/libzmq"]
+	path = lib/libzmq

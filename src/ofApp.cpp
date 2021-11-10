@@ -256,14 +256,11 @@ void ofApp::update() {
         lineChangeTimeNext = ofGetElapsedTimeMillis();
     }
     
-    if(paragraphs[0]->attractPoint.y < yTarget /*|| yTarget - paragraphs[0]->attractPoint.y >= paragraphs[0]->ttfBig.getLineHeight()/(paragraphs[0]->DPI_SCALE_FACTOR*1.4)*/) {
-                
-        if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs) {
-            
+    if(paragraphs[0]->attractPoint.y < yTarget ) {
+        if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs ) {
             // After dwell time return to previous line
             yTarget = paragraphs[0]->attractPoint.y;
         }
-        
     } else {
         // reset if still in in same line
         lineChangeTimePrevious = ofGetElapsedTimeMillis();
