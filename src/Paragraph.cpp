@@ -636,7 +636,6 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
         ofRectangle lineRect(0, line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
                              mWidth+200, mLineHeight + (mWordBoundaryPadding * 2));
         
-        
            
         if( lineRect.inside(focusPos) ) {
             currentLine = line;
@@ -648,9 +647,7 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
             }
             currentLineNumber = ln;
             
-            
             inLastWord = lineRect.inside(nP) && nP.x >= line.back()->rect.getMinX();
-            
             
             for (std::size_t i = 0, eL = currentLine.size(); i != eL; ++i) {
                 auto &w = currentLine.at(i);
@@ -685,7 +682,7 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
     } else {
     }
     
-    std::cout<<inLastWord<<std::endl;
+    //std::cout<<inLastWord<<std::endl;
     
     if ( ofGetElapsedTimeMillis() - freezeLastWordTime > lineTransitionDwellTime) {
         

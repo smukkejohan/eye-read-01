@@ -139,7 +139,8 @@ class Paragraph{
     
         unsigned int long freezeLastWordTime = 0;
 
-        
+        int mLineHeight;
+
     private:
         
         int magnifyScale;
@@ -149,7 +150,6 @@ class Paragraph{
         int mIndent;
         int mLeading;
         int mSpacing;
-        int mLineHeight;
         std::string mText;
         ofColor mColor;
         Alignment mAlignment;

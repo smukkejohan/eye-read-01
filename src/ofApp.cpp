@@ -186,10 +186,10 @@ void ofApp::setup()
     }
     
 // load our fonts and layout our paragraphs //
-    paragraphs[0]->setFont("Futura", pFontSize);
+    paragraphs[0]->setFont("Helvetica", pFontSize); // Set font here
     //ofxSmartFont::list();
     
-    int pLeading = pFontSize*.85; // 0.65
+    int pLeading = pFontSize*1.3; //.85; // 0.65 // // Set line spacing here
     int tWidth = paragraphs.size()*pWidth + (paragraphs.size()-1)*pPadding;
     
     int x = (ofGetWidth() - tWidth)/2;
@@ -238,8 +238,7 @@ void ofApp::update() {
     filter.setQ(filterQ);
     
     rawx = ofClamp(rawx, paragraphs[0]->x, paragraphs[0]->x+paragraphs[0]->getWidth());
-    rawy = ofClamp(rawy, paragraphs[0]->y, paragraphs[0]->y+paragraphs[0]->getHeight());
-    
+    rawy = ofClamp(rawy, paragraphs[0]->y - (paragraphs[0]->mLineHeight * 3), paragraphs[0]->y+paragraphs[0]->getHeight());
     
     paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
     
@@ -256,7 +255,7 @@ void ofApp::update() {
         lineChangeTimeNext = ofGetElapsedTimeMillis();
     }
     
-    if(paragraphs[0]->attractPoint.y < yTarget ) {
+    if(rawy < yTarget - (paragraphs[0]->mLineHeight*2)) {
         if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs ) {
             // After dwell time return to previous line
             yTarget = paragraphs[0]->attractPoint.y;
