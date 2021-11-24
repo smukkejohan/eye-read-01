@@ -8,6 +8,8 @@
 #pragma once
 #include <ofGraphics.h>
 #include "ofTrueTypeFont.h"
+#include <string>
+#include <regex>
 
 class Paragraph{
     
@@ -94,7 +96,7 @@ class Paragraph{
     
         void calculateAttractPoint(float x, float y);
     
-    void calculateAttractPointScrolling(float x, float y);
+        void calculateAttractPointScrolling(float x, float y);
     
         void calculateMagnifiedLetters(float x, float y, int numLettersLeft=4, int numLettersRight=15, bool pushLeft=true, bool magnifyWholeWords=true);
         void drawMagnifiedLetters(float x, float y, bool pushLeft=true, bool magnifyWholeWords=true);
@@ -111,6 +113,11 @@ class Paragraph{
         void drawBorder(bool draw);
         void drawBorder(ofColor color);
         void drawWordBoundaries(bool draw = true);
+    
+    
+        void drawHintHighlight(ofVec2f pos, float p, int extendBack=0, int extendForward=0);
+    
+        void drawHintHighlightSentences(ofVec2f pos, float p, int extendBack=0, int extendForward=0);
     
     
     /*struct bigWord {
@@ -169,6 +176,8 @@ class Paragraph{
         std::vector< word > mWords;
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
+    
+
     
         std::vector< word*> nextLine;
 

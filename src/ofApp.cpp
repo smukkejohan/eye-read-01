@@ -103,31 +103,42 @@ void ofApp::setup()
     
     gui.add(pushText.set("push", true));
     
-    gui.add(magnifyWholeWords.set("Whole words", true));
     
-    gui.add(numLettersLeft.set("letters left", 4, 0, 20));
+    gui.add(mode.set("Mode", 1, 0, 1));
     
-    gui.add(numLettersRight.set("letters right", 15, 0, 30));
+    gui.add(filterFc.set("filterFc", 0.011));
+    gui.add(filterQ.set("filterQ", 0.707));
+    
+    zoom_mode_params.setName("Magnified reading");
+        
+    zoom_mode_params.add(magnifyWholeWords.set("Magnify whole words", true));
+    zoom_mode_params.add(numLettersLeft.set("Magnify letters left", 4, 0, 20));
+    zoom_mode_params.add(numLettersRight.set("Magnify letters right", 15, 0, 30));
+    
+    zoom_mode_params.add(lineChangePreviousDwellMs.set("Dwell previous line (ms)", 1200, 0, 6000));
+    zoom_mode_params.add(lineChangeNextDwellMs.set("Dwell next line (ms)", 600, 0, 3000));
+    zoom_mode_params.add(freezeLastWordDwellTime.set("Dwell last word (ms)", 2000, 0, 4000));
+    zoom_mode_params.add(lineTransitionDwellTime.set("Dwell line progression (ms)", 10000, 4000, 20000));
+    
+    gui.add(zoom_mode_params);
+    
+    hint_mode_params.setName("Returned Gaze Hint");
+    hint_mode_params.add(hintDurationMs.set("Duration (ms)", 2000, 10, 8000));
+    
+    hint_mode_params.add(hintExtendBack.set("Extend lines back", 1, 0, 4));
+    hint_mode_params.add(hintExtendForward.set("Extend lines forward", 1, 0, 4));
+    
+    gui.add(hint_mode_params);
+
+
     
     /*gui.add(magnifyScale.set("mag scale", 4, 1.0, 8.0));
     magnifyScale.addListener(this, &ofApp::magScaleChanged);
     */
     
-    gui.add(filterFc.set("filterFc", 0.011));
+    gui.add(showCursor.set("Draw gaze point", true));
+    gui.add(showAttractPoint.set("Draw attract point", true));
     
-    gui.add(filterQ.set("filterQ", 0.707));
-    
-    gui.add(lineChangePreviousDwellMs.set("dwell previous", 1200, 0, 6000));
-    gui.add(lineChangeNextDwellMs.set("dwell next", 600, 0, 3000));
-
-    gui.add(freezeLastWordDwellTime.set("dwell last word", 2000, 0, 4000));
-    gui.add(lineTransitionDwellTime.set("dwell next locked", 10000, 4000, 20000));
-    
-    gui.add(showCursor.set("draw ", true));
-
-    gui.add(showAttractPoint.set("attract point", true));
-
-
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
     //pupilZmq.connect();
@@ -214,9 +225,6 @@ void ofApp::setup()
 
 void ofApp::update() {
     
-    paragraphs[0]->freezeLastWordDwellTime = freezeLastWordDwellTime.get();
-    paragraphs[0]->lineTransitionDwellTime = lineTransitionDwellTime.get();
-        
     if(bUseEyeTracker) {
         //std::cout<<TobiiX<<":"<<TobiiY<<std::endl;
         //pupilZmq.receive();
@@ -237,54 +245,95 @@ void ofApp::update() {
     filter.setFc(filterFc);
     filter.setQ(filterQ);
     
-    rawx = ofClamp(rawx, paragraphs[0]->x, paragraphs[0]->x+paragraphs[0]->getWidth());
-    rawy = ofClamp(rawy, paragraphs[0]->y - (paragraphs[0]->mLineHeight * 3), paragraphs[0]->y+paragraphs[0]->getHeight());
     
-    paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
+    if(mode.get() == ZOOM_READING_MODE) {
     
-    // TODO: handle one line up better
-    if(paragraphs[0]->attractPoint.y > yTarget) {
-        if (ofGetElapsedTimeMillis() - lineChangeTimeNext > lineChangeNextDwellMs) {
+        paragraphs[0]->freezeLastWordDwellTime = freezeLastWordDwellTime.get();
+        paragraphs[0]->lineTransitionDwellTime = lineTransitionDwellTime.get();
+        
+        rawx = ofClamp(rawx, paragraphs[0]->x, paragraphs[0]->x+paragraphs[0]->getWidth());
+        rawy = ofClamp(rawy, paragraphs[0]->y - (paragraphs[0]->mLineHeight * 3), paragraphs[0]->y+paragraphs[0]->getHeight());
+    
+        paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
+    
+        if(paragraphs[0]->attractPoint.y > yTarget) {
+            if (ofGetElapsedTimeMillis() - lineChangeTimeNext > lineChangeNextDwellMs) {
+                
+                // After dwell time continue to next line
+                yTarget = paragraphs[0]->attractPoint.y;
+            }
             
-            // After dwell time continue to next line
-            yTarget = paragraphs[0]->attractPoint.y;
+        } else {
+            // reset if still in in same line
+            lineChangeTimeNext = ofGetElapsedTimeMillis();
         }
         
-    } else {
-        // reset if still in in same line
-        lineChangeTimeNext = ofGetElapsedTimeMillis();
-    }
-    
-    if(rawy < yTarget - (paragraphs[0]->mLineHeight*2)) {
-        if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs ) {
-            // After dwell time return to previous line
-            yTarget = paragraphs[0]->attractPoint.y;
+        if(rawy < yTarget - (paragraphs[0]->mLineHeight*2)) {
+            if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs ) {
+                // After dwell time return to previous line
+                yTarget = paragraphs[0]->attractPoint.y;
+            }
+        } else {
+            // reset if still in in same line
+            lineChangeTimePrevious = ofGetElapsedTimeMillis();
         }
-    } else {
-        // reset if still in in same line
-        lineChangeTimePrevious = ofGetElapsedTimeMillis();
+        
+        filter.update(ofVec2f( paragraphs[0]->attractPoint.x, yTarget ));
+        
+        x = filter.value().x;
+        y = filter.value().y;
+        
+        //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
+        paragraphs[0]->calculateScrollingLine(x, y, rawx, rawy);
+        
+        // TODO: sampling rate setting
+        // semi colon and linebreak seperated in a txt file
+        // name file with timestamp
+        // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
+        
+        stringstream data;
+        data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
+        file.writeFromBuffer(ofBuffer(data));
+        
+    } else if(mode == RETURN_HINT_MODE) {
+        
+        if(
+           (rawx < paragraphs[0]->x || rawx > paragraphs[0]->x + paragraphs[0]->getWidth()) ||
+           (rawy < paragraphs[0]->y - paragraphs[0]->mLineHeight || rawy > paragraphs[0]->y + paragraphs[0]->getHeight())
+           
+           ) {
+            
+            if(!lookAway) {
+                lookAway = true;
+                lookBackOrAwayTime = ofGetElapsedTimeMillis();
+                lastLookAtPosition = filter.value(); // TODO: we might need to save a value from a short moment before ? or is filter enough?
+            }
+            
+            
+        } else {
+            
+            if(lookAway) {
+                lookAway = false;
+                lookBackOrAwayTime = ofGetElapsedTimeMillis();
+            }
+            
+            paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
+            filter.update(ofVec2f( paragraphs[0]->attractPoint.x, paragraphs[0]->attractPoint.y ));
+            x = filter.value().x;
+            y = filter.value().y;
+            
+        }
+        
+        
+
+        
     }
-    
-    filter.update(ofVec2f( paragraphs[0]->attractPoint.x, yTarget ));
-    
-    x = filter.value().x;
-    y = filter.value().y;
-    
-    //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
-    paragraphs[0]->calculateScrollingLine(x, y, rawx, rawy);
-    
-    // TODO: sampling rate setting
-    // semi colon and linebreak seperated in a txt file
-    // name file with timestamp 
-    // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
-    
-    stringstream data;
-    data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
-    file.writeFromBuffer(ofBuffer(data));
 }
 
 void ofApp::draw()
 {
+    
+    if(mode.get() == ZOOM_READING_MODE) {
     // std::cout << "draw" << std::endl;
     // draw the paragraphs
     // how to get word and letter at fixation point?
@@ -358,6 +407,28 @@ void ofApp::draw()
      */
     //fbo1.draw(0, 0);
     //shader.end();
+        
+    } else if(mode == RETURN_HINT_MODE) {
+        ofClear(255, 255, 255, 255);
+        ofSetColor(255);
+        
+        float hintP = 0;
+        unsigned int elapsed = ofGetElapsedTimeMillis() - lookBackOrAwayTime;
+        
+        if(elapsed < hintDurationMs.get() && !lookAway ) {
+            // Just looked back
+            hintP = ofClamp(ofMap(elapsed, 0, hintDurationMs.get(), 1.0, 0.0), 0.0, 1.0);
+            
+        }
+        
+        //std::cout<<hintP<<std::endl;
+        paragraphs[0]->drawHintHighlight(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
+        
+        //paragraphs[0]->drawHintHighlightSentences(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
+        
+
+        
+    }
     
     ofPushStyle();
     if(showCursor) {

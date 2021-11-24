@@ -57,7 +57,6 @@ void Paragraph::draw()
                    mHeight + (mBorderPadding * 2));
         }
     ofPopStyle();
-    
 }
 
 void Paragraph::draw(int x, int y)
@@ -346,6 +345,233 @@ bool sortWordsByDistance(Paragraph::word & a, Paragraph::word & b){
 }
 
 
+void Paragraph::drawHintHighlightSentences(ofVec2f _pos, float p, int extendBack, int extendForward) {
+        
+    ofPushMatrix();
+    ofTranslate(this->x, this->y);
+    ofPushStyle();
+    ofVec2f pos(_pos.x - this->x, _pos.y - this->y);
+        
+    if(p > 0) {
+        std::vector< std::vector<word*> > hintLines;
+        
+        for(int i=0; i<mLines.size(); i++) {
+            auto &line = mLines[i];
+            
+            if(line.size() > 0) {
+                if(pos.y < line.front()->rect.y) {
+                    
+                    for(int wi=0; wi<line.size(); wi++ ) {
+                        auto &w = line.at(wi);
+                        
+                        if(pos.x < w->rect.x + w->rect.width) {
+                            
+                            // Found current word
+
+                            
+                            int foundBack = 0;
+                            int foundForward = 0;
+                            
+                            bool finishBack = false;
+                            bool finishForward = false;
+                            
+                            int lineIndex = i;
+                            int wordIndex = wi;
+                            
+                            //int startLine = i;
+                            //int startWord = wi;
+                            
+                            
+                            while(!finishBack) {
+                                
+                                // move back one word
+                                if(wordIndex-1 < 0) {
+                                    
+                                    if (lineIndex == 0) {
+                                        finishBack = true;
+                                    } else {
+                                        lineIndex--;
+                                        wordIndex = mLines.at(lineIndex).size()-1;
+                                    }
+                                    
+                                } else {
+                                    wordIndex--;
+                                }
+                                    
+                                auto &testWordBack = mLines.at(lineIndex).at(wordIndex);
+                                                
+                                if (finishBack || std::regex_match (testWordBack->text, std::regex("\\.|\\;|\\?|\\!") )){
+                                    foundBack++;
+                                    finishBack = true; // Check how many sentences here
+                                    
+                                    for(int ll=lineIndex; ll <=i; ll++ ) {
+                                        
+                                        int toword = mLines.at(ll).size();
+                                        if(ll == i) {
+                                            toword = wi;
+                                        }
+                                        std::vector< word*> hintLine;
+                                        hintLines.push_back(hintLine);
+                                        
+                                        for(int ww=0; ww < toword; ww++ ) {
+                                            hintLine.push_back(mLines.at(ll).at(ww));
+                                        }
+                                    }
+                                    
+                                    int lineIndex = i;
+                                    int wordIndex = wi;
+                                    
+                                    while(!finishForward) {
+                                        // move forward one word
+                                        if(wordIndex+1 >= mLines.at(lineIndex).size()) {
+                                            
+                                            if (lineIndex+1 == mLines.size()) {
+                                                finishForward = true;
+                                                
+                                            } else {
+                                                lineIndex++;
+                                                wordIndex = 0;
+                                            }
+
+                                        } else {
+                                            wordIndex++;
+                                        }
+                                        
+                                        auto &testWordForward = mLines.at(lineIndex).at(wordIndex);
+                                                        
+                                        if (finishForward || std::regex_match (testWordForward->text, std::regex("\\.|\\;|\\?|\\!") )){
+                                            
+                                            foundForward++;
+                                            finishForward = true; // Check how many sentences here
+                                            
+                                            for(int ll=i; ll <=lineIndex; ll++ ) {
+                                                
+                                                if(ll == i) {
+                                                    for(int ww=wi; ww < mLines.at(ll).size(); ww++ ) {
+                                                        hintLines.back().push_back(mLines.at(ll).at(ww));
+                                                    }
+                                                    
+                                                } else {
+                                                    
+                                                    std::vector< word*> hintLine;
+                                                    
+                                                    int toword = mLines.at(ll).size();
+                                                    if(ll == lineIndex) {
+                                                        toword = wordIndex;
+                                                    }
+
+                                                    for(int ww=0; ww < toword; ww++ ) {
+                                                        hintLine.push_back(mLines.at(ll).at(ww));
+                                                    }
+                                                    hintLines.push_back(hintLine);
+                                                    
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            break;
+                        }
+                    }
+                    break;
+                    
+                    
+                    
+                    
+                }
+            }
+        }
+        
+        for(auto &line : hintLines) {
+            if(line.size() > 0) {
+                ofRectangle lineRect(line.front()->rect.x,
+                line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
+                line.back()->rect.width, mLineHeight + (mWordBoundaryPadding * 2));
+                
+                ofSetColor(255, 255, 0, p*255.0);
+                ofDrawRectangle(lineRect);
+            }
+        }
+    }
+    
+    
+    for(auto &line : mLines) {
+        
+        // Draw text
+        ofSetColor(0,0,0);
+        for(auto &w : line) {
+            ttf.drawString(w->text, w->rect.x, w->rect.y);
+        }
+            
+    }
+    
+    ofPopStyle();
+    ofPopMatrix();
+
+}
+
+
+void Paragraph::drawHintHighlight(ofVec2f _pos, float p, int extendBack, int extendForward) {
+    
+    bool useSentences = true;
+    
+    ofPushMatrix();
+    ofTranslate(this->x, this->y);
+    ofPushStyle();
+    
+    ofVec2f pos(_pos.x - this->x, _pos.y - this->y);
+        
+    if(p > 0) {
+        //int hintLineNum = 0;
+        std::vector< std::vector<word*> > hintLines;
+        
+        for(int i=0; i<mLines.size(); i++) {
+            auto &line = mLines[i];
+            
+            if(line.size() > 0) {
+                if(pos.y < line.front()->rect.y) {
+                    
+                    for(int h= std::max(i-extendBack, 0); h < std::min(i+extendForward+1, (int)mLines.size()); h++) {
+                        hintLines.push_back(mLines[h]);
+                    }
+                    
+                    break;
+                }
+            }
+        }
+        
+        for(auto &line : hintLines) {
+            if(line.size() > 0) {
+                ofRectangle lineRect(0,
+                line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
+                mWidth, mLineHeight + (mWordBoundaryPadding * 2));
+                
+                ofSetColor(255, 255, 0, p*255.0);
+                ofDrawRectangle(lineRect);
+            }
+        }
+    }
+    
+    
+    for(auto &line : mLines) {
+        
+        // Draw text
+        ofSetColor(0,0,0);
+        for(auto &w : line) {
+            ttf.drawString(w->text, w->rect.x, w->rect.y);
+        }
+            
+    }
+    
+    ofPopStyle();
+    ofPopMatrix();
+
+}
+
+
 void Paragraph::calculateAttractPoint(float x, float y) {
     
     ofVec2f pos(x - this->x, y - this->y);
@@ -388,7 +614,6 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
         
         // TODO: don't continue if we have not moved down the page
         attractPoint = ofVec2f(this->x + p.x, this->y + p.y);
-        
         return;
     }
 
@@ -414,7 +639,6 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
             break;
         }
     }
-    
 }
 
 
@@ -1147,7 +1371,6 @@ void Paragraph::drawNearestWord(float x, float y) {
 void Paragraph::getLetterCentroid(float x, float y) {
     
 }
-
 
 
 

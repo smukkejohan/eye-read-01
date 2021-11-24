@@ -243,7 +243,24 @@ class ofApp : public ofBaseApp{
     
     ofParameter<int> freezeLastWordDwellTime;
     ofParameter<int> lineTransitionDwellTime;
+    
+    ofParameter<int> mode;
+    
+    ofParameterGroup zoom_mode_params;
+    ofParameterGroup hint_mode_params;
 
+    const int ZOOM_READING_MODE = 0;
+    const int RETURN_HINT_MODE = 1;
+    
+    bool lookAway = false;
+    unsigned int long lookBackOrAwayTime = 0;
+    ofParameter<int> hintDurationMs;
+    
+    ofParameter<int> hintExtendBack;
+    ofParameter<int> hintExtendForward;
+
+    
+    ofVec2f lastLookAtPosition;
 };
 
 
