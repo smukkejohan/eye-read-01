@@ -291,10 +291,6 @@ void ofApp::update() {
         // name file with timestamp
         // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
         
-        stringstream data;
-        data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
-        file.writeFromBuffer(ofBuffer(data));
-        
     } else if(mode == RETURN_HINT_MODE) {
         
         if(
@@ -324,10 +320,12 @@ void ofApp::update() {
             
         }
         
-        
-
-        
     }
+    
+    stringstream data;
+    data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
+    file.writeFromBuffer(ofBuffer(data));
+    
 }
 
 void ofApp::draw()
@@ -393,7 +391,6 @@ void ofApp::draw()
        //shader.setUniformTexture("tex0", fbo1.getTexture(), 0);
         // send distance to top of line
         // send lineheight
-    
         // send bounds of current word
         // send bounds of current line
     
@@ -423,10 +420,7 @@ void ofApp::draw()
         
         //std::cout<<hintP<<std::endl;
         paragraphs[0]->drawHintHighlight(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
-        
         //paragraphs[0]->drawHintHighlightSentences(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
-        
-
         
     }
     

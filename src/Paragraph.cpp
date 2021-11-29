@@ -534,6 +534,8 @@ void Paragraph::drawHintHighlight(ofVec2f _pos, float p, int extendBack, int ext
             if(line.size() > 0) {
                 if(pos.y < line.front()->rect.y) {
                     
+                    currentLineNumber = i; // for data saving
+                    
                     for(int h= std::max(i-extendBack, 0); h < std::min(i+extendForward+1, (int)mLines.size()); h++) {
                         hintLines.push_back(mLines[h]);
                     }
