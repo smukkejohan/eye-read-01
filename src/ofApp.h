@@ -177,6 +177,24 @@ class ofApp : public ofBaseApp{
 		void draw();
         void update();
     
+    
+    // audio stuff
+    void audioOut(ofSoundBuffer & buffer);
+    ofSoundStream soundStream;
+    float pan;
+    int sampleRate;
+    bool bNoise;
+    float volume;
+    
+    vector <float> lAudio;
+    vector <float> rAudio;
+    
+    // synth
+    float     targetFrequency;
+    float     phase;
+    float     phaseAdder;
+    float     phaseAdderTarget;
+    
     void magScaleChanged(float & value) {
         //paragraphs[0]->setFont("Helvetica", pFontSize, value);
     }
@@ -208,6 +226,7 @@ class ofApp : public ofBaseApp{
     //float BOTTOM_LEFT_X = 0.38111690686729993;
     //float BOTTOM_RIGHT_X = 0.685358948107331;
     //float BOTTOM_RIGHT_Y = 0.4051380090533916;
+    
     
     unsigned int long lineChangeTimeNext = 0;
     unsigned int long lineChangeTimePrevious = 0;
@@ -253,11 +272,31 @@ class ofApp : public ofBaseApp{
     const int RETURN_HINT_MODE = 1;
     
     bool lookAway = false;
+    
+    bool hintActive = false;
+    unsigned int long hintActiveTime = 0;
+
+    
     unsigned int long lookBackOrAwayTime = 0;
     ofParameter<int> hintDurationMs;
+    ofParameter<int> hintLookAwayThresholdMs;
+    
+    ofParameter<int> hintLookAwayDeadzonePadding;
+
     
     ofParameter<int> hintExtendBack;
     ofParameter<int> hintExtendForward;
+    
+    ofParameter<int> hintAudioDurationMs;
+
+    
+    ofParameter<float> audioHintAmp;
+    ofParameter<float> audioHintTargetFreq;
+
+    ofParameter<bool> audioHintNoise;
+    ofParameter<bool> audioHintVariableFreq;
+
+
 
     
     ofVec2f lastLookAtPosition;

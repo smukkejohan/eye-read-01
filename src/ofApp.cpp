@@ -90,9 +90,68 @@ void PupilZmq::receive() {
     
 }
 
+void ofApp::audioOut(ofSoundBuffer & buffer){
+    //pan = 0.5f;
+    float leftScale = 1 - pan;
+    float rightScale = pan;
+
+    // sin (n) seems to have trouble when n is very large, so we
+    // keep phase in the range of 0-TWO_PI like this:
+    while (phase > TWO_PI){
+        phase -= TWO_PI;
+    }
+
+    if ( audioHintNoise.get() == true){
+        // ---------------------- noise --------------
+        for (size_t i = 0; i < buffer.getNumFrames(); i++){
+            lAudio[i] = buffer[i*buffer.getNumChannels()    ] = ofRandom(0, 1) * volume * leftScale;
+            rAudio[i] = buffer[i*buffer.getNumChannels() + 1] = ofRandom(0, 1) * volume * rightScale;
+        }
+    } else {
+        phaseAdder = 0.95f * phaseAdder + 0.05f * phaseAdderTarget;
+        for (size_t i = 0; i < buffer.getNumFrames(); i++){
+            phase += phaseAdder;
+            float sample = sin(phase);
+            lAudio[i] = buffer[i*buffer.getNumChannels()    ] = sample * volume * leftScale;
+            rAudio[i] = buffer[i*buffer.getNumChannels() + 1] = sample * volume * rightScale;
+        }
+    }
+
+}
+
 
 void ofApp::setup()
 {
+    
+    
+    int bufferSize        = 512;
+    sampleRate             = 44100;
+    phase                 = 0;
+    phaseAdder             = 0.0f;
+    phaseAdderTarget     = 0.0f;
+    volume                = 0.1f;
+    
+    lAudio.assign(bufferSize, 0.0);
+    rAudio.assign(bufferSize, 0.0);
+    
+    ofSoundStreamSettings settings;
+    
+#ifdef TARGET_LINUX
+    // Latest linux versions default to the HDMI output
+    // this usually fixes that. Also check the list of available
+    // devices if sound doesn't work
+    auto devices = soundStream.getMatchingDevices("default");
+    if(!devices.empty()){
+        settings.setOutDevice(devices[0]);
+    }
+#endif
+    settings.setOutListener(this);
+    settings.sampleRate = sampleRate;
+    settings.numOutputChannels = 2;
+    settings.numInputChannels = 0;
+    settings.bufferSize = bufferSize;
+    soundStream.setup(settings);
+
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
     ofEnableSmoothing();
@@ -123,10 +182,24 @@ void ofApp::setup()
     gui.add(zoom_mode_params);
     
     hint_mode_params.setName("Returned Gaze Hint");
-    hint_mode_params.add(hintDurationMs.set("Duration (ms)", 2000, 10, 8000));
+    hint_mode_params.add(hintDurationMs.set("Duration (ms)", 2000, 0, 10000));
+    hint_mode_params.add(hintAudioDurationMs.set("Duration audio (ms)", 2000, 0, 10000));
+
+    hint_mode_params.add(hintLookAwayThresholdMs.set("Look away threshold", 1200, 0, 10000));
+    
+    hint_mode_params.add(hintLookAwayDeadzonePadding.set("Deadzone padding", 200, 0, 400));
+
     
     hint_mode_params.add(hintExtendBack.set("Extend lines back", 1, 0, 4));
     hint_mode_params.add(hintExtendForward.set("Extend lines forward", 1, 0, 4));
+    
+    hint_mode_params.add(audioHintAmp.set("Audio amplitude", 0.1f, 0, 1));
+    hint_mode_params.add(audioHintNoise.set("Audio noise", false));
+    hint_mode_params.add(audioHintVariableFreq.set("Audio var freq", false));
+    hint_mode_params.add(audioHintTargetFreq.set("Audio freq", 800, 20, 20000));
+
+    
+    
     
     gui.add(hint_mode_params);
 
@@ -292,34 +365,81 @@ void ofApp::update() {
         // "timestamp: rawx, rawy, filteredx, filteredy, currentline"
         
     } else if(mode == RETURN_HINT_MODE) {
+        int pad = hintLookAwayDeadzonePadding.get();
+        
+        unsigned int t = ofGetElapsedTimeMillis();
+
         
         if(
-           (rawx < paragraphs[0]->x || rawx > paragraphs[0]->x + paragraphs[0]->getWidth()) ||
-           (rawy < paragraphs[0]->y - paragraphs[0]->mLineHeight || rawy > paragraphs[0]->y + paragraphs[0]->getHeight())
+           (rawx < paragraphs[0]->x - pad || rawx > paragraphs[0]->x + paragraphs[0]->getWidth() + pad ) ||
+           (rawy < paragraphs[0]->y - paragraphs[0]->mLineHeight - pad || rawy > paragraphs[0]->y + paragraphs[0]->getHeight() + pad)
            
            ) {
             
             if(!lookAway) {
                 lookAway = true;
-                lookBackOrAwayTime = ofGetElapsedTimeMillis();
+                lookBackOrAwayTime = t;
                 lastLookAtPosition = filter.value(); // TODO: we might need to save a value from a short moment before ? or is filter enough?
+                
+                int width = ofGetWidth();
+                pan = (float)lastLookAtPosition.x / (float)width;
+                float height = (float)ofGetHeight();
+                float heightPct = ((height-lastLookAtPosition.y) / height);
+                
+                // conditional frequency map
+                if(audioHintVariableFreq.get()) {
+                    targetFrequency = audioHintTargetFreq.get() * heightPct;
+                } else {
+                    targetFrequency = audioHintTargetFreq.get();
+                }
+                
+                phaseAdderTarget = (targetFrequency / (float) sampleRate) * TWO_PI;
+            }
+            
+            
+            unsigned int elapsed = t - lookBackOrAwayTime;
+            if(elapsed > hintLookAwayThresholdMs.get() && !hintActive) {
+                hintActive = true;
+                hintActiveTime = t;
             }
             
             
         } else {
             
             if(lookAway) {
-                lookAway = false;
-                lookBackOrAwayTime = ofGetElapsedTimeMillis();
+                
+                if(
+                   rawx > paragraphs[0]->x && rawx < paragraphs[0]->x + paragraphs[0]->getWidth() &&
+                   rawy > paragraphs[0]->y && rawy < paragraphs[0]->y + paragraphs[0]->getHeight()
+                   ) {
+                    
+                    lookAway = false;
+                    lookBackOrAwayTime = t;
+                    
+                }
+                    
+                    
+
+            } else {
+                
+                unsigned int elapsed = t - lookBackOrAwayTime;
+                unsigned int elapsedHint = t - hintActiveTime;
+
+                if(elapsed > hintDurationMs.get() && elapsed > hintAudioDurationMs.get()) {
+                    hintActive = false;
+                }
+                
             }
+            
+
             
             paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
             filter.update(ofVec2f( paragraphs[0]->attractPoint.x, paragraphs[0]->attractPoint.y ));
             x = filter.value().x;
             y = filter.value().y;
             
+            
         }
-        
     }
     
     stringstream data;
@@ -404,19 +524,45 @@ void ofApp::draw()
      */
     //fbo1.draw(0, 0);
     //shader.end();
-        
     } else if(mode == RETURN_HINT_MODE) {
         ofClear(255, 255, 255, 255);
         ofSetColor(255);
         
         float hintP = 0;
-        unsigned int elapsed = ofGetElapsedTimeMillis() - lookBackOrAwayTime;
+        float hintPAudio = 0;
         
-        if(elapsed < hintDurationMs.get() && !lookAway ) {
-            // Just looked back
-            hintP = ofClamp(ofMap(elapsed, 0, hintDurationMs.get(), 1.0, 0.0), 0.0, 1.0);
+        unsigned int t = ofGetElapsedTimeMillis();
+        
+        unsigned int elapsed = t - lookBackOrAwayTime;
+        unsigned int elapsedHint = t - hintActiveTime;
+
+        if(hintActive ) {
+            if(lookAway) {
+                hintP = 1;
+            } else {
+                if(elapsed < hintDurationMs.get() ) {
+                    // Just looked back
+                    hintP = ofClamp(ofMap(elapsed, 0, hintDurationMs.get(), 1.0, 0.0), 0.0, 1.0);
+                    
+                }
+                
+                if(elapsed < hintAudioDurationMs.get() ) {
+                    // Just looked back
+                    hintPAudio = ofClamp(ofMap(elapsed, 0, hintAudioDurationMs.get(), 1.0, 0.0), 0.0, 1.0);
+                    
+                }
+                
+            }
+            
+
             
         }
+        
+
+        
+
+        
+        volume = hintPAudio * audioHintAmp.get();
         
         //std::cout<<hintP<<std::endl;
         paragraphs[0]->drawHintHighlight(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
@@ -443,6 +589,13 @@ void ofApp::draw()
     
     ofSetColor(0);
     ofDrawBitmapString(ofGetFrameRate(), ofGetWidth()-80, ofGetHeight()-40);
+    
+    ofDrawBitmapString("l", 10, ofGetHeight()-40);
+    ofDrawBitmapString(lookAway, 20, ofGetHeight()-40);
+    
+    ofDrawBitmapString("h", 10, ofGetHeight()-80);
+    ofDrawBitmapString(hintActive, 20, ofGetHeight()-80);
+
     
     ofSetColor(255);
     gui.draw();

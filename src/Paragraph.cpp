@@ -558,6 +558,7 @@ void Paragraph::drawHintHighlight(ofVec2f _pos, float p, int extendBack, int ext
     }
     
     
+    
     for(auto &line : mLines) {
         
         // Draw text
