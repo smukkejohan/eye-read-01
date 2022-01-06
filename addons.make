@@ -1,2 +1,3 @@
 ofxBiquadFilter
+ofxBlur
 ofxGui

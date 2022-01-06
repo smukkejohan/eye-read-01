@@ -10,8 +10,11 @@
 #include "ofTrueTypeFont.h"
 #include <string>
 #include <regex>
+#include "ofxBlur.h"
 
 class Paragraph{
+    
+        
     
     public:
     
@@ -149,6 +152,8 @@ class Paragraph{
         int mLineHeight;
 
     private:
+    
+        ofxBlur blur;
         
         int magnifyScale;
     

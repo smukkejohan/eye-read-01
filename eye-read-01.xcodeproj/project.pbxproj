@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04154F5D2787205100023DBD /* ofxBlur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04154F552787205100023DBD /* ofxBlur.cpp */; };
 		0422BE5825DE93E700E36BE9 /* libtobii_research.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0422BE5725DE93E700E36BE9 /* libtobii_research.dylib */; };
 		1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 907C5B5E104864A2D3A25745 /* ofxToggle.cpp */; };
 		483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78D67A00EB899FAC09430597 /* ofxLabel.cpp */; };
@@ -38,6 +39,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04154F552787205100023DBD /* ofxBlur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBlur.cpp; sourceTree = "<group>"; };
+		04154F562787205100023DBD /* ofxBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBlur.h; sourceTree = "<group>"; };
 		0422BE5725DE93E700E36BE9 /* libtobii_research.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtobii_research.dylib; path = lib/TobiiPro/64/lib/libtobii_research.dylib; sourceTree = "<group>"; };
 		0A1DAC09F322AE313A40706D /* ofxToggle.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofxToggle.h; path = ../../../addons/ofxGui/src/ofxToggle.h; sourceTree = SOURCE_ROOT; };
 		15F2C6477A769C03A56D1401 /* ofxSlider.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofxSlider.cpp; path = ../../../addons/ofxGui/src/ofxSlider.cpp; sourceTree = SOURCE_ROOT; };
@@ -262,6 +265,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04154F452787205100023DBD /* ofxBlur */ = {
+			isa = PBXGroup;
+			children = (
+				04154F542787205100023DBD /* src */,
+			);
+			name = ofxBlur;
+			path = ../../../addons/ofxBlur;
+			sourceTree = "<group>";
+		};
+		04154F542787205100023DBD /* src */ = {
+			isa = PBXGroup;
+			children = (
+				04154F552787205100023DBD /* ofxBlur.cpp */,
+				04154F562787205100023DBD /* ofxBlur.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		0422BE5625DE93E700E36BE9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -336,6 +357,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				04154F452787205100023DBD /* ofxBlur */,
 				27005CFF506A34FD3734C3CE /* ofxBiquadFilter */,
 				480A780D8D0308AE4A368801 /* ofxGui */,
 			);
@@ -751,6 +773,7 @@
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				6E9609E71F8CB565AA215194 /* Paragraph.cpp in Sources */,
+				04154F5D2787205100023DBD /* ofxBlur.cpp in Sources */,
 				D820615CFDD5F497033D7C5A /* ofxBiquadFilter.cpp in Sources */,
 				A7CF97A6E1DAE4A002CA6F82 /* ofxBiquadFilterInstance.cpp in Sources */,
 				856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */,
