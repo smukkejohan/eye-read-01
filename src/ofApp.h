@@ -265,6 +265,10 @@ class ofApp : public ofBaseApp{
     
     ofParameter<int> mode;
     
+    
+    ofParameter<double> magXFilterFc;
+    ofParameter<double> magXFilterQ;
+    
     ofParameterGroup zoom_mode_params;
     ofParameterGroup hint_mode_params;
 

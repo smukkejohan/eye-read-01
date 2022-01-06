@@ -11,6 +11,8 @@
 #include <string>
 #include <regex>
 #include "ofxBlur.h"
+#include "ofxBiquadFilter.h"
+
 
 class Paragraph{
     
@@ -148,10 +150,14 @@ class Paragraph{
         int lineTransitionDwellTime = 10000;
     
         unsigned int long freezeLastWordTime = 0;
-
         int mLineHeight;
+        
+        float scrollFilterQ = 0.707;
+        float scrollFilterFc = 0.091;
 
     private:
+        
+        ofxBiquadFilter1f scrollFilter;
     
         ofxBlur blur;
         

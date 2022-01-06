@@ -165,19 +165,22 @@ void ofApp::setup()
     
     gui.add(mode.set("Mode", 1, 0, 1));
     
-    gui.add(filterFc.set("filterFc", 0.011));
-    gui.add(filterQ.set("filterQ", 0.707));
+    gui.add(filterFc.set("filterFc", 0.025));
+    gui.add(filterQ.set("filterQ", 0.5));
     
     zoom_mode_params.setName("Magnified reading");
         
-    zoom_mode_params.add(magnifyWholeWords.set("Magnify whole words", true));
-    zoom_mode_params.add(numLettersLeft.set("Magnify letters left", 4, 0, 20));
-    zoom_mode_params.add(numLettersRight.set("Magnify letters right", 15, 0, 30));
+    //zoom_mode_params.add(magnifyWholeWords.set("Magnify whole words", true));
+    //zoom_mode_params.add(numLettersLeft.set("Magnify letters left", 4, 0, 20));
+    //zoom_mode_params.add(numLettersRight.set("Magnify letters right", 15, 0, 30));
     
     zoom_mode_params.add(lineChangePreviousDwellMs.set("Dwell previous line (ms)", 1200, 0, 6000));
     zoom_mode_params.add(lineChangeNextDwellMs.set("Dwell next line (ms)", 600, 0, 3000));
     zoom_mode_params.add(freezeLastWordDwellTime.set("Dwell last word (ms)", 2000, 0, 4000));
     zoom_mode_params.add(lineTransitionDwellTime.set("Dwell line progression (ms)", 10000, 4000, 20000));
+    
+    //zoom_mode_params.add(magXFilterFc.set("mag filterFc", 0.011));
+    //zoom_mode_params.add(magXFilterQ.set("mag filterQ", 0.707));
     
     gui.add(zoom_mode_params);
     
@@ -195,7 +198,7 @@ void ofApp::setup()
     
     hint_mode_params.add(audioHintAmp.set("Audio amplitude", 0.1f, 0, 1));
     hint_mode_params.add(audioHintNoise.set("Audio noise", false));
-    hint_mode_params.add(audioHintVariableFreq.set("Audio var freq", false));
+    hint_mode_params.add(audioHintVariableFreq.set("Audio var freq", true));
     hint_mode_params.add(audioHintTargetFreq.set("Audio freq", 800, 20, 20000));
 
     
