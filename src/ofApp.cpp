@@ -381,14 +381,14 @@ void ofApp::update() {
                 lookBackOrAwayTime = t;
                 lastLookAtPosition = filter.value(); // TODO: we might need to save a value from a short moment before ? or is filter enough?
                 
-                int width = ofGetWidth();
+                int width = paragraphs[0]->getWidth();
                 pan = (float)lastLookAtPosition.x / (float)width;
-                float height = (float)ofGetHeight();
-                float heightPct = ((height-lastLookAtPosition.y) / height);
+                //float height = (float)ofGetHeight();
+                //float heightPct = ((height-lastLookAtPosition.y) / height);
                 
                 // conditional frequency map
                 if(audioHintVariableFreq.get()) {
-                    targetFrequency = audioHintTargetFreq.get() * heightPct;
+                    targetFrequency = audioHintTargetFreq.get() * pan;
                 } else {
                     targetFrequency = audioHintTargetFreq.get();
                 }
