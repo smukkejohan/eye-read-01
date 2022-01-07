@@ -152,8 +152,8 @@ class Paragraph{
         unsigned int long freezeLastWordTime = 0;
         int mLineHeight;
         
-        float scrollFilterQ = 0.707;
-        float scrollFilterFc = 0.091;
+        float scrollFilterQ = 0.40;
+        float scrollFilterFc = 0.04;
 
     private:
         
@@ -188,11 +188,13 @@ class Paragraph{
         std::vector< std::vector<word*> > mLines;
         std::vector< word*> currentLine;
     
+        std::string currentLineTxt = "";
 
-    
         std::vector< word*> nextLine;
 
-    float currentLineWidth;
+        float currentLineWidth;
+        float currentLineMagWidth;
+
     
         word* currentWord;
     

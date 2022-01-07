@@ -160,7 +160,7 @@ void ofApp::setup()
     gui.setup();
     gui.add(bUseEyeTracker.set("use eye tracker", true));
     
-    gui.add(pushText.set("push", true));
+    //gui.add(pushText.set("push", true));
     
     
     gui.add(mode.set("Mode", 1, 0, 1));
@@ -174,10 +174,10 @@ void ofApp::setup()
     //zoom_mode_params.add(numLettersLeft.set("Magnify letters left", 4, 0, 20));
     //zoom_mode_params.add(numLettersRight.set("Magnify letters right", 15, 0, 30));
     
-    zoom_mode_params.add(lineChangePreviousDwellMs.set("Dwell previous line (ms)", 1200, 0, 6000));
+    zoom_mode_params.add(lineChangePreviousDwellMs.set("Dwell previous line (ms)", 2500, 0, 6000));
     zoom_mode_params.add(lineChangeNextDwellMs.set("Dwell next line (ms)", 600, 0, 3000));
-    zoom_mode_params.add(freezeLastWordDwellTime.set("Dwell last word (ms)", 2000, 0, 4000));
-    zoom_mode_params.add(lineTransitionDwellTime.set("Dwell line progression (ms)", 10000, 4000, 20000));
+    //zoom_mode_params.add(freezeLastWordDwellTime.set("Dwell last word (ms)", 2000, 0, 4000));
+    zoom_mode_params.add(lineTransitionDwellTime.set("Dwell line progression (ms)", 6000, 4000, 20000));
     
     //zoom_mode_params.add(magXFilterFc.set("mag filterFc", 0.011));
     //zoom_mode_params.add(magXFilterQ.set("mag filterQ", 0.707));

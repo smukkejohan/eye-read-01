@@ -286,7 +286,7 @@ void Paragraph::render()
             // look at: https://github.com/sosolimited/ofxSoso/blob/master/src/ofxSosoTrueTypeFont.cpp#L1049
             // we also do not handle ligatures at the moment
             
-            std::vector<ofPath> letterPaths =  ttfBig.getStringAsPoints(w->text);
+            std::vector<ofPath> letterPaths = ttfBig.getStringAsPoints(w->text);
             w->letterPaths = letterPaths;
             
             float lX = w->rect.getX();
@@ -685,83 +685,29 @@ void Paragraph::drawScrollingLine() {
     if(currentLine.size() > 0) {
         // Draw current line magnified - using eye movement to scroll
         
-            std::string maglinetxt = "";
-            
-            if(isLastWord) {
-                
-                /*for(auto &w : currentLine) {
-                    if(w != currentWord) {
-                        ttf.drawString(w->text, w->rect.x, w->rect.y);
-                    }
-                }*/
-                std::string linetxt = "";
-                
-                for(int i=0; i < currentLine.size()-1; i++ ) {
-                    auto &w = currentLine.at(i);
-                    linetxt += w->text;
-                    linetxt += " ";
-                }
-                
-                for(auto &w : currentLine) {
-                    maglinetxt += w->text;
-                    if(w != currentLine.back()) {
-                        maglinetxt += " ";
-                    }
-                }
-                                    
-                ofPushMatrix();
-                ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
-                ofScale(scale, scale);
+        
+        ofPushMatrix();
+        ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
+        ofScale(scale, scale);
                         
-                // draw background
-                ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
-                    
-                //int rJ = (mWidth/scale) - bounding.width;
-                //bounding.setX(rJ);
-                    
-                //if(ofGetElapsedTimeMillis() - freezeLastWordTime < freezeLastWordDwellTime) {
-                    
-                    ofSetColor(255,255,255);
-                    ofDrawRectangle(bounding);
-                    ofSetColor(0,0,0);
-                    ttfBig.drawStringAsShapes(maglinetxt, (focusPos.x/scale) + (-scrollIn * bounding.width),  0); // TODO: do not reference unfitered focusPos value  should be derived from scroll in
-                //}
-                ofPopMatrix();
-                    
-                //ofRectangle prl = ttf.getStringBoundingBox(linetxt, 0, 0);
-                //float wD = mWidth - prl.width;
-                    
-                /*if(ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime) {
-                    linetxt += currentLine.back()->text;
-                }*/
-                
-                //ofSetColor(0,0,0);
-                //ttf.drawString(linetxt, currentLine.front()->rect.x - (bounding.width*scale - wD), currentLine.front()->rect.y);
-
-            } else {
-                
-                for(auto &w : currentLine) {
-                    maglinetxt += w->text;
-                    if(w != currentLine.back()) {
-                        maglinetxt += " ";
-                    }
-                }
-                
-                ofPushMatrix();
-                ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
-                ofScale(scale, scale);
-                    
-                // draw background
-                ofSetColor(255,255,255);
-                ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
-                ofDrawRectangle(bounding);
-            
-                ofSetColor(0,0,0);
-                ttfBig.drawStringAsShapes(maglinetxt, (focusPos.x/scale) + (-scrollIn * bounding.width),  0);
-                // TODO: do not reference unfitered focusPos value  should be derived from scroll in
-                
-                ofPopMatrix();
+        // draw background
+        ofRectangle backgroundBounds = ttfBig.getStringBoundingBox(currentLineTxt, 0, 0);
+        ofSetColor(255,255,255);
+        ofDrawRectangle(-currentLine.front()->rect.x/scale, backgroundBounds.getMax().y, ofGetWidth()/scale, -backgroundBounds.height);
+        
+        ofSetColor(0, 0, 0);
+        int xIn = 0;
+        for(auto &w : currentLine) {
+            ofRectangle wordBounding = ttfBig.getStringBoundingBox(w->text, scrollIn, 0);
+            ttfBig.drawStringAsShapes(w->text, xIn + scrollIn, 0);
+            xIn += wordBounding.width;
+            if(w != currentLine.back()) {
+                xIn += mSpacing*magnifyScale;
             }
+        }
+        
+        ofPopMatrix();
+                    
         
         // Mask off magnified outside of paragraph
         ofSetColor(255,255,255);
@@ -770,82 +716,28 @@ void Paragraph::drawScrollingLine() {
         
         
     }
-
         
-    if(isLastWord /*&& ofGetElapsedTimeMillis() - freezeLastWordTime > freezeLastWordDwellTime*/) {
-        
+    if(isLastWord) {
         if(nextLine.size() > 0) {
-            
-            //std::string linetxt = "";
-            /*for(int i=0; i < nextLine.size(); i++ ) {
-                auto &w = nextLine.at(i);
-                linetxt += w->text;
-                linetxt += " ";
-            }*/
-            
             ofSetColor(0, 0, 0);
             for(auto &w : nextLine) {
                 ttf.drawString(w->text, w->rect.x, w->rect.y);
             }
-            
-            // Draw next line (not magnified yet UPDATE JANUARY 2021) magnified
-            
-                //std::string maglinetxt = "";
-                //maglinetxt += nextLine.front()->text;
-    
-                //ofPushMatrix();
-                //ofTranslate(nextLine.front()->rect.x, nextLine.front()->rect.y);
-                //ofScale(scale, scale);
-
-                //ofScale(0.025,0.025);
-                    
-                // draw background
-                //ofSetColor(255,255,255);
-                //ofRectangle bounding = ttfBig.getStringBoundingBox(maglinetxt, 0, 0);
-            //ofDrawRectangle(0, bounding.y, bounding.width+4, bounding.height+2 );
-                    
-                //ofSetColor(0,0,0);
-                //ttfBig.drawStringAsShapes(maglinetxt, 0, 0);
-            
-                //ofPopMatrix();
-            
-            
-            //ofRectangle prl = ttf.getStringBoundingBox(linetxt, 0, 0);
-            //float wD = currentLineWidth - prl.width;
-            
-            //ttf.drawString(linetxt, bounding.width*scale, nextLine.front()->rect.y);
-            
-            // Mask off magnified outside of paragraph
-            ofSetColor(255,255,255);
-            ofDrawRectangle(-this->x, nextLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
-            ofDrawRectangle(mWidth, nextLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
-            
-            
         }
-        
-    } else if(nextLine.size() > 0) {
-        
-        /*for(auto &w : nextLine) {
-            ofSetColor(0,0,0);
-            ttf.drawString(w->text, w->rect.x, w->rect.y);
-        }*/
-        
     }
     
     ofPopStyle();
     
-    ofSetColor(0,0,0,50);
-    ofDrawCircle(focusPos, 40);
-    
+    //ofSetColor(0,0,0,50);
+    //ofDrawCircle(focusPos, 40);
     ofPopMatrix();
         
     // ofDrawCircle(draw_magnifyBounding.width/2 , linePos, 20);
-    ofSetColor(0,0,0);
+    //ofSetColor(0,0,0);
     
-    ofDrawBitmapString(currentLineNumber, 40, ofGetHeight() - 80);
-    ofDrawBitmapString(isLastWord, 40, ofGetHeight() - 60);
-    ofDrawBitmapString(ofGetElapsedTimeMillis() - freezeLastWordTime, 40, ofGetHeight() - 40);
-    
+    //ofDrawBitmapString(currentLineNumber, 40, ofGetHeight() - 80);
+    //ofDrawBitmapString(isLastWord, 40, ofGetHeight() - 60);
+    //ofDrawBitmapString(ofGetElapsedTimeMillis() - freezeLastWordTime, 40, ofGetHeight() - 40);
     
     //ofSetColor(0,0,0, 200);
 
@@ -879,57 +771,75 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
         //}
         
         if( ofVec2f(nextLine.front()->rect.position).distance(nP) < bounding.width ) {
-            //nextLineTargetReached = true;
+            nextLineTargetReached = true;
             freezeLastWord = false;
             focusPos = ofVec2f(x - this->x, y - this->y);
+            scrollFilter.clear(0);
         }
     } else {
         focusPos = ofVec2f(x - this->x, y - this->y);
     }
     
     int ln = 0;
-    //currentLineWidth = 0;
-    
+        
     for(auto &line : mLines) {
         ln++;
         
         ofRectangle lineRect(0, line.front()->rect.y - mLineHeight - mWordBoundaryPadding,
                              mWidth+200, mLineHeight + (mWordBoundaryPadding * 2));
         
-           
         if( lineRect.inside(focusPos) ) {
             currentLine = line;
             currentLineWidth = 0;
+            currentLineMagWidth = 0;
+            currentLineTxt = "";
+            currentLineNumber = ln;
+            
+            for(auto &w : currentLine) {
+                currentLineTxt += w->text;
+                if(w != currentLine.back()) {
+                    currentLineTxt += " ";
+                }
+            }
             
             if( mLines.size() > ln ) {
                 nextLine = mLines.at(ln);
             } else {
                 nextLine.clear();
             }
-            currentLineNumber = ln;
             
+            //currentLineWidth = ttf.getStringBoundingBox(currentLineTxt, 0, 0).width;
             inLastWord = lineRect.inside(nP) && nP.x >= line.back()->rect.getMinX();
             
             for (std::size_t i = 0, eL = currentLine.size(); i != eL; ++i) {
                 auto &w = currentLine.at(i);
                    
-                ofRectangle r(w->rect.x - (mWordBoundaryPadding + spaceWidthPx),
+                ofRectangle wordRect(w->rect.x - (mWordBoundaryPadding + spaceWidthPx),
                        w->rect.y - mLineHeight*2.25 - mWordBoundaryPadding,
                        w->rect.width + (mWordBoundaryPadding + spaceWidthPx)*2,
                        mLineHeight*4 + (mWordBoundaryPadding * 2));
                 
-                currentLineWidth += r.width;
+                ofRectangle wordBound = ttf.getStringBoundingBox(w->text, w->rect.x, 0);
+                currentLineWidth += wordBound.width;
+                if(w != currentLine.back()) {
+                    currentLineWidth += mSpacing;
+                }
                 
-                if( r.inside(focusPos) ) {
+                ofRectangle bigBounding = ttfBig.getStringBoundingBox(w->text, 0, 0);
+                currentLineMagWidth += bigBounding.width;
+                if(w != currentLine.back()) {
+                    currentLineMagWidth += mSpacing*magnifyScale;
+                }
+                                
+                if( wordRect.inside(focusPos) ) {
                     currentWord = w;
                 }
                 
                 if(i == currentLine.size()-1 ) {
-                    if(focusPos.x > r.getMinX()) {
+                    if(focusPos.x > wordRect.getMinX()) {
                         if(nextLine.size() > 0) {
                             isLastWord = true;
-                            
-                            // TODO: set focusPos.x to end scrollIn will filter
+                            focusPos.x = currentLineWidth;
                         }
                     }
                 }
@@ -956,11 +866,12 @@ void Paragraph::calculateScrollingLine(float x, float y, float rawx, float rawy)
     }
     
     focusPos.x = ofClamp(focusPos.x, 0, currentLineWidth);
-    if(focusPos.x < 10) {
-        focusPos.x = 0; // dont cut the first 3 letters TODO: calculate this more accurately
+    if(focusPos.x < mSpacing*3) {
+        focusPos.x = 0;
     }
     //scrollIn = ofMap(focusPos.x, 0, currentLineWidth, 0, 1);
-    scrollIn = scrollFilter.update(ofMap(focusPos.x, 0, currentLineWidth, 0, 1));
+        
+    scrollIn = scrollFilter.update((focusPos.x/scale) + (-ofMap(focusPos.x, 0, currentLineWidth, 0, 1) * currentLineMagWidth));
 }
 
 
@@ -1139,28 +1050,19 @@ void Paragraph::drawMagnifiedLetters(float x, float y, bool push, bool magnifyWh
     // draw original in red to debug alignment
     
     if(draw_magnifyStr != next_magnifyStr) {
-        
         draw_magnifyStr = next_magnifyStr;
-        
         draw_leftLettersStr = next_leftLettersStr;
         draw_rightLettersStr = next_rightLettersStr;
-        
         draw_wordsBefore = next_wordsBefore;
         draw_wordsAfter = next_wordsAfter;
-           
         draw_leftWordX = ofLerp(draw_leftWordX, next_leftWordX, 1);
         draw_rightWordX = ofLerp(draw_rightWordX, next_rightWordX, 1);
         draw_xOffsetLeft = ofLerp(draw_xOffsetLeft, next_xOffsetLeft, 1);
-        
         draw_magnifyPos = draw_magnifyPos.getInterpolated(next_magnifyPos, 1);
-        
         next_magnifyBounding = ttfBig.getStringBoundingBox(next_magnifyStr, 0, 0);
         next_xOffsetRight = (next_magnifyBounding.width /10) - next_xOffsetLeft;
-
         draw_xOffsetRight = ofLerp(draw_xOffsetRight, next_xOffsetRight, 1);
-        
         draw_magnifyBounding = next_magnifyBounding;
-        
     }
 
     
