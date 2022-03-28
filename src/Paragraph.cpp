@@ -24,7 +24,7 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
     setAlignment(align);
     setWidth(width);
     
-    blur.setup(ofGetWidth(), ofGetHeight(), 2, .2, 2);
+    blur.setup(ofGetWidth(), ofGetHeight(), 10, .2, 2);
     
     //blur.setScale(1);
     //blur.setRotation(0); // -PI to PI
