@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<settings-3>
+	<group>
+		<use_eye_tracker>0</use_eye_tracker>
+		<Text>Vi var kommet forbi striben af firkantede lodder, flade, bortset fra de gule etplanshuse, der var skudt op på nogle af dem. Og så lå den der pludselig, vejen. Den var ryddet for sne og skar sig gennem alt det hvide i begge retninger, så langt man kunne se. Det så pænt ud. Måske forstærket af alt roderiet bag os, stierne, grusvejene, markerne og byggepladserne, som vi ikke kunne hitte ud af. På den anden side var en mark, hvid og med striber af sort, fuget jord. Den fortsatte udefter og over i en gråhvid dis. Det var et mærkeligt sted, så langt væk, man kunne komme, og med universet og rummet trukket tæt på. Vi spurgte, om vi var der, om det var dét her. Så løftede han armen og pegede ud over marken, som om han ville kommandere os fremad eller sige "dér ovre, lige på den anden side." Det samme sted eller lidt derfra stod en række kæmpestore betonskeletter, uhyggelige, levende væsener og samtidig papirstynde og skrøbelige og så bittesmå, at man kunne løfte dem op i hånden eller vælte dem ét ad gangen med et puf med det yderste af fingrene. De så fine ud, række efter række og en lille smule forskudt i en skrå linje bagud. Nedefra var de oplyst af projektører, der skar dem fri af mørket og trak dem tættere på, så de i nogle feberagtige, svimlende sekunder så ud til at ville lette. Og så gik vi hjem. Imens fortalte han en af sine historier. Til sidst bar han mig. Det er det år, mine forældre er blevet skilt. Det samme er Louis forældre eller gået fra hinanden, for de var ikke rigtig gift ligesom mine. Det var hans mor, der gik, eller løb, hele vejen til Sønderjylland efter at være blevet gennembanket i årevis. Kort før den dag på grillbaren var skoleinspektøren kommet midt i en musiktime og havde givet mig et brev fra Louis, hvor han fortalte det hele. Han skrev også, at hans mor var dum.</Text>
+		<Mode>0</Mode>
+		<filterFc>0.025</filterFc>
+		<filterQ>0.5</filterQ>
+		<Magnified_reading>
+			<Dwell_previous_line__ms_>2500</Dwell_previous_line__ms_>
+			<Dwell_next_line__ms_>600</Dwell_next_line__ms_>
+			<Dwell_line_progression__ms_>6000</Dwell_line_progression__ms_>
+		</Magnified_reading>
+		<Returned_Gaze_Hint>
+			<Duration__ms_>2000</Duration__ms_>
+			<Duration_audio__ms_>2000</Duration_audio__ms_>
+			<Look_away_threshold>1200</Look_away_threshold>
+			<Deadzone_padding>200</Deadzone_padding>
+			<Extend_lines_back>1</Extend_lines_back>
+			<Extend_lines_forward>1</Extend_lines_forward>
+			<Audio_amplitude>0.1</Audio_amplitude>
+			<Audio_noise>0</Audio_noise>
+			<Audio_var_freq>1</Audio_var_freq>
+			<Audio_freq>800</Audio_freq>
+		</Returned_Gaze_Hint>
+		<Draw_gaze_point>0</Draw_gaze_point>
+		<Draw_attract_point>0</Draw_attract_point>
+	</group>
+</settings-3>

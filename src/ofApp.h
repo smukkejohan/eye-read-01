@@ -190,10 +190,12 @@ class ofApp : public ofBaseApp{
         void update();
         void exit();
     
+    
+    void loadSettings(string name);
+    
         void keyPressed(int key);
     void keyReleased(int key);
 
-        
         // audio stuff
         void audioOut(ofSoundBuffer & buffer);
         ofSoundStream soundStream;
@@ -216,7 +218,6 @@ class ofApp : public ofBaseApp{
         }
         
         vector<Paragraph*> paragraphs;
-
         ofxBiquadFilter2f filter;
         
         ofShader shader;
@@ -242,7 +243,6 @@ class ofApp : public ofBaseApp{
         //float BOTTOM_LEFT_X = 0.38111690686729993;
         //float BOTTOM_RIGHT_X = 0.685358948107331;
         //float BOTTOM_RIGHT_Y = 0.4051380090533916;
-        
         
         unsigned int long lineChangeTimeNext = 0;
         unsigned int long lineChangeTimePrevious = 0;
@@ -282,12 +282,15 @@ class ofApp : public ofBaseApp{
         
         ofParameter<int> mode;
         
-        
         ofParameter<double> magXFilterFc;
         ofParameter<double> magXFilterQ;
         
+        ofParameterGroup all_params;
         ofParameterGroup zoom_mode_params;
         ofParameterGroup hint_mode_params;
+        ofParameterGroup hidden_params;
+    
+        ofParameter<string> textParam;
 
         const int ZOOM_READING_MODE = 0;
         const int RETURN_HINT_MODE = 1;
@@ -297,13 +300,11 @@ class ofApp : public ofBaseApp{
         bool hintActive = false;
         unsigned int long hintActiveTime = 0;
 
-        
         unsigned int long lookBackOrAwayTime = 0;
         ofParameter<int> hintDurationMs;
         ofParameter<int> hintLookAwayThresholdMs;
         
         ofParameter<int> hintLookAwayDeadzonePadding;
-
         
         ofParameter<int> hintExtendBack;
         ofParameter<int> hintExtendForward;
@@ -316,9 +317,6 @@ class ofApp : public ofBaseApp{
 
         ofParameter<bool> audioHintNoise;
         ofParameter<bool> audioHintVariableFreq;
-
-
-
         
         ofVec2f lastLookAtPosition;
 };

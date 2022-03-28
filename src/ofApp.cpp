@@ -156,24 +156,17 @@ void ofApp::setup()
     ofEnableAlphaBlending();
     ofEnableSmoothing();
     ofSetFrameRate(60);
-    
-    gui.setup();
-    gui.add(bUseEyeTracker.set("use eye tracker", true));
-    
-    //gui.add(pushText.set("push", true));
-    
-    
-    gui.add(mode.set("Mode", 1, 0, 1));
-    
-    gui.add(filterFc.set("filterFc", 0.025));
-    gui.add(filterQ.set("filterQ", 0.5));
-    
-    zoom_mode_params.setName("Magnified reading");
         
+    all_params.add(bUseEyeTracker.set("use eye tracker", true));
+    //gui.add(pushText.set("push", true));
+    all_params.add(textParam.set("Text", text1));
+    all_params.add(mode.set("Mode", 1, 0, 1));
+    all_params.add(filterFc.set("filterFc", 0.025));
+    all_params.add(filterQ.set("filterQ", 0.5));
+    zoom_mode_params.setName("Magnified reading");
     //zoom_mode_params.add(magnifyWholeWords.set("Magnify whole words", true));
     //zoom_mode_params.add(numLettersLeft.set("Magnify letters left", 4, 0, 20));
     //zoom_mode_params.add(numLettersRight.set("Magnify letters right", 15, 0, 30));
-    
     zoom_mode_params.add(lineChangePreviousDwellMs.set("Dwell previous line (ms)", 2500, 0, 6000));
     zoom_mode_params.add(lineChangeNextDwellMs.set("Dwell next line (ms)", 600, 0, 3000));
     //zoom_mode_params.add(freezeLastWordDwellTime.set("Dwell last word (ms)", 2000, 0, 4000));
@@ -182,7 +175,7 @@ void ofApp::setup()
     //zoom_mode_params.add(magXFilterFc.set("mag filterFc", 0.011));
     //zoom_mode_params.add(magXFilterQ.set("mag filterQ", 0.707));
     
-    gui.add(zoom_mode_params);
+    all_params.add(zoom_mode_params);
     
     hint_mode_params.setName("Returned Gaze Hint");
     hint_mode_params.add(hintDurationMs.set("Duration (ms)", 2000, 0, 10000));
@@ -201,18 +194,20 @@ void ofApp::setup()
     hint_mode_params.add(audioHintVariableFreq.set("Audio var freq", true));
     hint_mode_params.add(audioHintTargetFreq.set("Audio freq", 800, 20, 20000));
 
-    gui.add(hint_mode_params);
+    all_params.add(hint_mode_params);
     
     /*gui.add(magnifyScale.set("mag scale", 4, 1.0, 8.0));
     magnifyScale.addListener(this, &ofApp::magScaleChanged);
     */
     
-    gui.add(showCursor.set("Draw gaze point", true));
-    gui.add(showAttractPoint.set("Draw attract point", true));
+    all_params.add(showCursor.set("Draw gaze point", true));
+    all_params.add(showAttractPoint.set("Draw attract point", true));
     
     //gui.add(radius.set("radius", radius));
     //gui.add(magnificationArea.set("magnify area", magnificationArea));
     //pupilZmq.connect();
+    
+    loadSettings("settings-1");
     
     if(bUseEyeTracker) {
         try {
@@ -291,6 +286,7 @@ void ofApp::setup()
     file.writeFromBuffer(ofBuffer(data));
     
     std::cout << "end setup" << std::endl;
+    
 }
 
 
@@ -609,22 +605,50 @@ void ofApp::keyPressed(int key){
 
 }
 
+void ofApp::loadSettings(string name) {
+    gui.setup(name, name + ".xml");
+    gui.add(all_params);
+    gui.loadFromFile(name + ".xml");
+}
+
 void ofApp::keyReleased(int key){
     
     switch(key) {
         case 'x':
             drawGui = !drawGui;
             break;
-        case 1:
+        case '1':
+            loadSettings("settings-1");
             break;
-        case 2:
+        case '2':
+            loadSettings("settings-2");
+            break;
+        case '3':
+            loadSettings("settings-3");
+            break;
+        case '4':
+            loadSettings("settings-4");
+            break;
+        case '5':
+            loadSettings("settings-5");
+            break;
+        case '6':
+            loadSettings("settings-6");
+            break;
+        case '7':
+            loadSettings("settings-7");
+            break;
+        case '8':
+            loadSettings("settings-8");
+            break;
+        case '9':
+            loadSettings("settings-9");
             break;
         default:
             break;
     }
     
 }
-
 
 void ofApp::exit()
 {
