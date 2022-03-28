@@ -596,13 +596,35 @@ void ofApp::draw()
 
     
     ofSetColor(255);
-    gui.draw();
+    if(drawGui) {
+        gui.draw();
+    }
     
     ofSetColor(0);
 
     /*ofDrawRectangle(paragraphs[0]->x, paragraphs[0]->y, paragraphs[0]->getWidth(), paragraphs[0]->getHeight());*/
+}
+
+void ofApp::keyPressed(int key){
+
+}
+
+void ofApp::keyReleased(int key){
+    
+    switch(key) {
+        case 'x':
+            drawGui = !drawGui;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            break;
+    }
     
 }
+
 
 void ofApp::exit()
 {
