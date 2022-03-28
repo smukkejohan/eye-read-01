@@ -239,16 +239,16 @@ void ofApp::setup()
     ofBackground(ofColor::white);
     ofSetFullscreen(true);
     
-    ofBuffer textBuffer = ofBufferFromFile(ofToDataPath("text.txt"), false);
-    
-    Paragraph* p = new Paragraph(textBuffer.getText());
+    //loadText();
+
+    Paragraph* p = new Paragraph(textParam.get());
     
         p->setColor(ofColor::fromHex(0x555555));
         //p->drawBorder(ofColor::fromHex(0x777777));
         //p->drawWordBoundaries();
         p->setAlignment(Paragraph::ALIGN_LEFT);
        
-        paragraphs.push_back(p);
+        paragraph = p;
 
 // change these to whatever you want //
     int pWidth = ofGetScreenWidth() * 0.6;
@@ -263,20 +263,19 @@ void ofApp::setup()
     }
     
 // load our fonts and layout our paragraphs //
-    paragraphs[0]->setFont("Helvetica", pFontSize); // Set font here
+    paragraph->setFont("Helvetica", pFontSize); // Set font here
     //ofxSmartFont::list();
     
     int pLeading = pFontSize*1.3; //.85; // 0.65 // // Set line spacing here
-    int tWidth = paragraphs.size()*pWidth + (paragraphs.size()-1)*pPadding;
+    int tWidth = pWidth; // + pPadding;
     
     int x = (ofGetWidth() - tWidth)/2;
-    for (int i=0; i<paragraphs.size(); i++){
-        paragraphs[i]->setWidth(pWidth);
-        paragraphs[i]->setLeading(pLeading);
-        paragraphs[i]->setSpacing(pFontSize*.7);
-        paragraphs[i]->setBorderPadding(30);
-        paragraphs[i]->setPosition(x+((pWidth+pPadding)*i), ofGetHeight()/2 - paragraphs[0]->getHeight()/2);
-    }
+    
+    paragraph->setWidth(pWidth);
+    paragraph->setLeading(pLeading);
+    paragraph->setSpacing(pFontSize*.7);
+    paragraph->setBorderPadding(30);
+    paragraph->setPosition(x, ofGetHeight()/2 - paragraph->getHeight()/2);
     
     file.open(ofToDataPath("data-export-"+ofGetTimestampString()+".txt"), ofFile::ReadWrite);
     file.create();
@@ -315,19 +314,19 @@ void ofApp::update() {
     
     if(mode.get() == ZOOM_READING_MODE) {
     
-        paragraphs[0]->freezeLastWordDwellTime = freezeLastWordDwellTime.get();
-        paragraphs[0]->lineTransitionDwellTime = lineTransitionDwellTime.get();
+        paragraph->freezeLastWordDwellTime = freezeLastWordDwellTime.get();
+        paragraph->lineTransitionDwellTime = lineTransitionDwellTime.get();
         
-        rawx = ofClamp(rawx, paragraphs[0]->x, paragraphs[0]->x+paragraphs[0]->getWidth());
-        rawy = ofClamp(rawy, paragraphs[0]->y - (paragraphs[0]->mLineHeight * 3), paragraphs[0]->y+paragraphs[0]->getHeight());
+        rawx = ofClamp(rawx, paragraph->x, paragraph->x+paragraph->getWidth());
+        rawy = ofClamp(rawy, paragraph->y - (paragraph->mLineHeight * 3), paragraph->y+paragraph->getHeight());
     
-        paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
+        paragraph->calculateAttractPointScrolling(rawx, rawy);
     
-        if(paragraphs[0]->attractPoint.y > yTarget) {
+        if(paragraph->attractPoint.y > yTarget) {
             if (ofGetElapsedTimeMillis() - lineChangeTimeNext > lineChangeNextDwellMs) {
                 
                 // After dwell time continue to next line
-                yTarget = paragraphs[0]->attractPoint.y;
+                yTarget = paragraph->attractPoint.y;
             }
             
         } else {
@@ -335,23 +334,23 @@ void ofApp::update() {
             lineChangeTimeNext = ofGetElapsedTimeMillis();
         }
         
-        if(rawy < yTarget - (paragraphs[0]->mLineHeight*2)) {
+        if(rawy < yTarget - (paragraph->mLineHeight*2)) {
             if (ofGetElapsedTimeMillis() - lineChangeTimePrevious > lineChangePreviousDwellMs ) {
                 // After dwell time return to previous line
-                yTarget = paragraphs[0]->attractPoint.y;
+                yTarget = paragraph->attractPoint.y;
             }
         } else {
             // reset if still in in same line
             lineChangeTimePrevious = ofGetElapsedTimeMillis();
         }
         
-        filter.update(ofVec2f( paragraphs[0]->attractPoint.x, yTarget ));
+        filter.update(ofVec2f( paragraph->attractPoint.x, yTarget ));
         
         x = filter.value().x;
         y = filter.value().y;
         
-        //paragraphs[0]->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
-        paragraphs[0]->calculateScrollingLine(x, y, rawx, rawy);
+        //paragraph->calculateMagnifiedLetters(x, y, numLettersLeft, numLettersRight, pushText, magnifyWholeWords);
+        paragraph->calculateScrollingLine(x, y, rawx, rawy);
         
         // TODO: sampling rate setting
         // semi colon and linebreak seperated in a txt file
@@ -365,8 +364,8 @@ void ofApp::update() {
 
         
         if(
-           (rawx < paragraphs[0]->x - pad || rawx > paragraphs[0]->x + paragraphs[0]->getWidth() + pad ) ||
-           (rawy < paragraphs[0]->y - paragraphs[0]->mLineHeight - pad || rawy > paragraphs[0]->y + paragraphs[0]->getHeight() + pad)
+           (rawx < paragraph->x - pad || rawx > paragraph->x + paragraph->getWidth() + pad ) ||
+           (rawy < paragraph->y - paragraph->mLineHeight - pad || rawy > paragraph->y + paragraph->getHeight() + pad)
            
            ) {
             
@@ -375,7 +374,7 @@ void ofApp::update() {
                 lookBackOrAwayTime = t;
                 lastLookAtPosition = filter.value(); // TODO: we might need to save a value from a short moment before ? or is filter enough?
                 
-                int width = paragraphs[0]->getWidth();
+                int width = paragraph->getWidth();
                 pan = (float)lastLookAtPosition.x / (float)width;
                 //float height = (float)ofGetHeight();
                 //float heightPct = ((height-lastLookAtPosition.y) / height);
@@ -403,8 +402,8 @@ void ofApp::update() {
             if(lookAway) {
                 
                 if(
-                   rawx > paragraphs[0]->x && rawx < paragraphs[0]->x + paragraphs[0]->getWidth() &&
-                   rawy > paragraphs[0]->y && rawy < paragraphs[0]->y + paragraphs[0]->getHeight()
+                   rawx > paragraph->x && rawx < paragraph->x + paragraph->getWidth() &&
+                   rawy > paragraph->y && rawy < paragraph->y + paragraph->getHeight()
                    ) {
                     
                     lookAway = false;
@@ -427,8 +426,8 @@ void ofApp::update() {
             
 
             
-            paragraphs[0]->calculateAttractPointScrolling(rawx, rawy);
-            filter.update(ofVec2f( paragraphs[0]->attractPoint.x, paragraphs[0]->attractPoint.y ));
+            paragraph->calculateAttractPointScrolling(rawx, rawy);
+            filter.update(ofVec2f( paragraph->attractPoint.x, paragraph->attractPoint.y ));
             x = filter.value().x;
             y = filter.value().y;
             
@@ -437,7 +436,7 @@ void ofApp::update() {
     }
     
     stringstream data;
-    data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraphs[0]->currentLineNumber<<std::endl;
+    data<<ofGetTimestampString()<<";"<<rawx<<";"<<rawy<<";"<<x<<";"<<y<<";"<<paragraph->currentLineNumber<<std::endl;
     file.writeFromBuffer(ofBuffer(data));
     
 }
@@ -481,13 +480,13 @@ void ofApp::draw()
     //ofScale(1,-1, 1);
         //for (int i=0; i<paragraphs.size(); i++){
         ofSetColor(255);
-        //paragraphs[0]->draw();
-        //paragraphs[0]->drawMagnified1(x, y, 4);
-        //paragraphs[0]->drawMagnifiedLetters(x, y, pushText, magnifyWholeWords);
+        //paragraph->draw();
+        //paragraph->drawMagnified1(x, y, 4);
+        //paragraph->drawMagnifiedLetters(x, y, pushText, magnifyWholeWords);
         
-        paragraphs[0]->drawScrollingLine();
+        paragraph->drawScrollingLine();
         
-    //paragraphs[0]->draw();
+    //paragraph->draw();
         //ofDrawCircle(x, y, 10);
 
         //}
@@ -559,8 +558,8 @@ void ofApp::draw()
         volume = hintPAudio * audioHintAmp.get();
         
         //std::cout<<hintP<<std::endl;
-        paragraphs[0]->drawHintHighlight(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
-        //paragraphs[0]->drawHintHighlightSentences(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
+        paragraph->drawHintHighlight(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
+        //paragraph->drawHintHighlightSentences(lastLookAtPosition, hintP, hintExtendBack.get(), hintExtendForward.get());
         
     }
     
@@ -576,7 +575,7 @@ void ofApp::draw()
             
     if(showAttractPoint) {
         ofSetColor(120,255,120, 127);
-        ofDrawCircle(paragraphs[0]->attractPoint, 4);
+        ofDrawCircle(paragraph->attractPoint, 4);
     }
     
     ofPopStyle();
@@ -598,7 +597,7 @@ void ofApp::draw()
     
     ofSetColor(0);
 
-    /*ofDrawRectangle(paragraphs[0]->x, paragraphs[0]->y, paragraphs[0]->getWidth(), paragraphs[0]->getHeight());*/
+    /*ofDrawRectangle(paragraph->x, paragraph->y, paragraph->getWidth(), paragraph->getHeight());*/
 }
 
 void ofApp::keyPressed(int key){
@@ -611,6 +610,10 @@ void ofApp::loadSettings(string name) {
     gui.loadFromFile(name + ".xml");
 }
 
+void ofApp::loadText() {
+    paragraph->setText(textParam.get());
+}
+
 void ofApp::keyReleased(int key){
     
     switch(key) {
@@ -619,30 +622,39 @@ void ofApp::keyReleased(int key){
             break;
         case '1':
             loadSettings("settings-1");
+            loadText();
             break;
         case '2':
             loadSettings("settings-2");
+            loadText();
             break;
         case '3':
             loadSettings("settings-3");
+            loadText();
             break;
         case '4':
             loadSettings("settings-4");
+            loadText();
             break;
         case '5':
             loadSettings("settings-5");
+            loadText();
             break;
         case '6':
             loadSettings("settings-6");
+            loadText();
             break;
         case '7':
             loadSettings("settings-7");
+            loadText();
             break;
         case '8':
             loadSettings("settings-8");
+            loadText();
             break;
         case '9':
             loadSettings("settings-9");
+            loadText();
             break;
         default:
             break;
