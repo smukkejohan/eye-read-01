@@ -201,12 +201,7 @@ void ofApp::setup()
     hint_mode_params.add(audioHintVariableFreq.set("Audio var freq", true));
     hint_mode_params.add(audioHintTargetFreq.set("Audio freq", 800, 20, 20000));
 
-    
-    
-    
     gui.add(hint_mode_params);
-
-
     
     /*gui.add(magnifyScale.set("mag scale", 4, 1.0, 8.0));
     magnifyScale.addListener(this, &ofApp::magScaleChanged);
@@ -261,7 +256,7 @@ void ofApp::setup()
         paragraphs.push_back(p);
 
 // change these to whatever you want //
-    int pWidth = 1400;
+    int pWidth = ofGetScreenWidth() * 0.6;
     int pFontSize = 14;
     float pPadding = pWidth*.30;
 
@@ -607,10 +602,9 @@ void ofApp::draw()
 
     /*ofDrawRectangle(paragraphs[0]->x, paragraphs[0]->y, paragraphs[0]->getWidth(), paragraphs[0]->getHeight());*/
     
-    
-    
 }
 
-
-
-
+void ofApp::exit()
+{
+    soundStream.close();
+}
