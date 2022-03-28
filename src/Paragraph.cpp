@@ -28,7 +28,6 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
     
     //blur.setScale(1);
     //blur.setRotation(0); // -PI to PI
-
     
 };
 
@@ -325,7 +324,24 @@ void Paragraph::render()
     }
     
     spaceWidthPx = ttf.getStringBoundingBox("a", 0, 0).width * 0.25;
-
+    
+    
+    blur.begin();
+    ofBackground(255,255,255);
+    ofPushMatrix();
+    //ofTranslate(this->x, this->y);
+    ofPushStyle();
+    
+        for(auto &line : mLines) {
+                ofSetColor(20,20,20);
+                for(auto &w : line) {
+                    ttf.drawString(w->text, w->rect.x, w->rect.y);
+                }
+        }
+    
+    ofPopStyle();
+    ofPopMatrix();
+    blur.end();
 }
 
 
@@ -655,36 +671,17 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
 void Paragraph::drawScrollingLine() {
     const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
     
-    blur.begin();
-    ofBackground(255,255,255);
-    ofPushMatrix();
-    ofTranslate(this->x, this->y);
-    ofPushStyle();
-    
-        for(auto &line : mLines) {
-            if((line != currentLine && line != nextLine) || (line == nextLine && !freezeLastWord)) {
-                ofSetColor(20,20,20);
-                for(auto &w : line) {
-                    ttf.drawString(w->text, w->rect.x, w->rect.y);
-                }
-            }
-        }
-    
-    ofPopStyle();
-    ofPopMatrix();
-    blur.end();
-    
-    blur.draw();
 
     ofPushMatrix();
     ofTranslate(this->x, this->y);
+    blur.draw();
+
     ofPushStyle();
     // Draw other lines
 
 
     if(currentLine.size() > 0) {
         // Draw current line magnified - using eye movement to scroll
-        
         
         ofPushMatrix();
         ofTranslate(currentLine.front()->rect.x, currentLine.front()->rect.y);
@@ -714,17 +711,8 @@ void Paragraph::drawScrollingLine() {
         ofDrawRectangle(-this->x, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
         ofDrawRectangle(mWidth, currentLine.front()->rect.y - mLineHeight * magnifyScale, this->x, mLineHeight * (magnifyScale+1));
         
-        
     }
         
-    if(isLastWord) {
-        if(nextLine.size() > 0) {
-            ofSetColor(0, 0, 0);
-            for(auto &w : nextLine) {
-                ttf.drawString(w->text, w->rect.x, w->rect.y);
-            }
-        }
-    }
     
     ofPopStyle();
     
