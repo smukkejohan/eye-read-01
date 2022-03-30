@@ -20,11 +20,12 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
 , mWordBoundaryColor(ofColor::red)
 , magnifyScale(4)
 {
+    blur.setup(ofGetWidth(), ofGetHeight(), width*0.02, 0.2, 2);
+
     setText(text);
     setAlignment(align);
     setWidth(width);
     
-    blur.setup(ofGetWidth(), ofGetHeight(), width*0.02, 0.2, 2);
     
     //blur.setScale(1);
     //blur.setRotation(0); // -PI to PI
@@ -665,12 +666,16 @@ void Paragraph::drawScrollingLine() {
     if(updateBlur) {
         blur.begin();
         ofBackground(255,255,255);
+        blur.end();
+        
+        blur.begin();
+        ofBackground(255,255,255);
         ofPushMatrix();
         ofTranslate(this->x, this->y);
         ofPushStyle();
         
             for(auto &line : mLines) {
-                    ofSetColor(80,80,80);
+                    ofSetColor(40,40,40);
                     for(auto &w : line) {
                         ttf.drawString(w->text, w->rect.x, w->rect.y);
                     }
