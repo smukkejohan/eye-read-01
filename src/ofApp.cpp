@@ -243,12 +243,12 @@ void ofApp::setup()
 
     Paragraph* p = new Paragraph(textParam.get());
     
-        p->setColor(ofColor::fromHex(0x555555));
-        //p->drawBorder(ofColor::fromHex(0x777777));
-        //p->drawWordBoundaries();
-        p->setAlignment(Paragraph::ALIGN_LEFT);
+    p->setColor(ofColor::fromHex(0x555555));
+    //p->drawBorder(ofColor::fromHex(0x777777));
+    //p->drawWordBoundaries();
+    p->setAlignment(Paragraph::ALIGN_LEFT);
        
-        paragraph = p;
+    paragraph = p;
 
 // change these to whatever you want //
     int pWidth = ofGetScreenWidth() * 0.6;
@@ -256,20 +256,19 @@ void ofApp::setup()
     float pPadding = pWidth*.30;
 
 // check for high resolution display //
-    if (ofGetScreenWidth()>=2560 && ofGetScreenHeight()>=1600)
+    /*if (ofGetScreenWidth()>=2560 && ofGetScreenHeight()>=1600)
     {
         pWidth*=2;
         pFontSize*=2;
-    }
+    }*/
     
 // load our fonts and layout our paragraphs //
     paragraph->setFont("Helvetica", pFontSize); // Set font here
     //ofxSmartFont::list();
     
     int pLeading = pFontSize*1.3; //.85; // 0.65 // // Set line spacing here
-    int tWidth = pWidth; // + pPadding;
     
-    int x = (ofGetWidth() - tWidth)/2;
+    int x = (ofGetWidth() - pWidth)/2;
     
     paragraph->setWidth(pWidth);
     paragraph->setLeading(pLeading);
@@ -612,6 +611,10 @@ void ofApp::loadSettings(string name) {
 
 void ofApp::loadText() {
     paragraph->setText(textParam.get());
+    
+    int x = (ofGetWidth() - paragraph->getWidth())/2;
+    paragraph->setPosition(x, ofGetHeight()/2 - paragraph->getHeight()/2);
+
 }
 
 void ofApp::keyReleased(int key){

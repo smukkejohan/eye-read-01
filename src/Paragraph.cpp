@@ -24,7 +24,7 @@ Paragraph::Paragraph(std::string text, int width, Alignment align)
     setAlignment(align);
     setWidth(width);
     
-    blur.setup(ofGetWidth(), ofGetHeight(), 10, .2, 2);
+    blur.setup(ofGetWidth(), ofGetHeight(), width*0.02, 0.2, 2);
     
     //blur.setScale(1);
     //blur.setRotation(0); // -PI to PI
@@ -100,8 +100,13 @@ int Paragraph::getStringHeight(std::string s)
 
 void Paragraph::setPosition(int x, int y)
 {
-    this->x = x;
-    this->y = y;
+    
+    if(x != this->x || y != this->y) {
+        updateBlur = true;
+        
+        this->x = x;
+        this->y = y;
+    }
 }
 
 void Paragraph::drawBorder(bool draw)
@@ -325,23 +330,8 @@ void Paragraph::render()
     
     spaceWidthPx = ttf.getStringBoundingBox("a", 0, 0).width * 0.25;
     
-    
-    blur.begin();
-    ofBackground(255,255,255);
-    ofPushMatrix();
-    //ofTranslate(this->x, this->y);
-    ofPushStyle();
-    
-        for(auto &line : mLines) {
-                ofSetColor(20,20,20);
-                for(auto &w : line) {
-                    ttf.drawString(w->text, w->rect.x, w->rect.y);
-                }
-        }
-    
-    ofPopStyle();
-    ofPopMatrix();
-    blur.end();
+    updateBlur = true;
+
 }
 
 
@@ -669,16 +659,39 @@ void Paragraph::calculateAttractPointScrolling(float x, float y) {
 
 
 void Paragraph::drawScrollingLine() {
+
     const double scale = (1.0/DPI_SCALE_FACTOR) * (1.0/magnifyScale) * magnifyScale;
     
-
+    if(updateBlur) {
+        blur.begin();
+        ofBackground(255,255,255);
+        ofPushMatrix();
+        ofTranslate(this->x, this->y);
+        ofPushStyle();
+        
+            for(auto &line : mLines) {
+                    ofSetColor(80,80,80);
+                    for(auto &w : line) {
+                        ttf.drawString(w->text, w->rect.x, w->rect.y);
+                    }
+            }
+        
+        ofPopStyle();
+        ofPopMatrix();
+        blur.end();
+        
+        updateBlur = false;
+    }
+    
+    //ofBackground(255,255,255);
+    ofSetColor(255,255,255);
+    blur.draw();
+    
     ofPushMatrix();
     ofTranslate(this->x, this->y);
-    blur.draw();
-
+    
     ofPushStyle();
     // Draw other lines
-
 
     if(currentLine.size() > 0) {
         // Draw current line magnified - using eye movement to scroll

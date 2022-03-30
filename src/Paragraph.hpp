@@ -160,6 +160,7 @@ class Paragraph{
         ofxBiquadFilter1f scrollFilter;
     
         ofxBlur blur;
+        bool updateBlur = true;
         
         int magnifyScale;
     
